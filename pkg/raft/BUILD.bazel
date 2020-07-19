@@ -5,6 +5,7 @@ go_library(
     srcs = ["raft.go"],
     importpath = "github.com/dunstall/goraft/pkg/raft",
     visibility = ["//visibility:public"],
+    deps = ["//pkg/pb:go_default_library"],
 )
 
 go_test(
