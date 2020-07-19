@@ -2,10 +2,19 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 
 go_library(
     name = "go_default_library",
-    srcs = ["raft.go"],
+    srcs = [
+        "client.go",
+        "config.go",
+        "follower.go",
+        "raft.go",
+        "server.go",
+    ],
     importpath = "github.com/dunstall/goraft/pkg/raft",
     visibility = ["//visibility:public"],
-    deps = ["//pkg/pb:go_default_library"],
+    deps = [
+        "//pkg/pb:go_default_library",
+        "@org_golang_google_grpc//:go_default_library",
+    ],
 )
 
 go_test(
