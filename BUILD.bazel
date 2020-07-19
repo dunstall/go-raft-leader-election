@@ -1,18 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 load("@bazel_gazelle//:def.bzl", "gazelle")
 
 # gazelle:prefix github.com/dunstall/goraft
 gazelle(name = "gazelle")
-
-go_library(
-    name = "go_default_library",
-    srcs = ["raft.go"],
-    importpath = "github.com/dunstall/goraft",
-    visibility = ["//visibility:public"],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = ["raft_test.go"],
-    embed = [":go_default_library"],
-)
