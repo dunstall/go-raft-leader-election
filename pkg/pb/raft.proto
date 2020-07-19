@@ -6,27 +6,27 @@ package pb;
 
 service Raft {
   // Invoked by leader to replicate log entries; also used as heartbeat
-  rpc AppendEntries (AppendEntriesRequest) returns (AppendEntriesResponse);
+  // rpc AppendEntries (AppendEntriesRequest) returns (AppendEntriesResponse);
 
   // Invoked by candidates to gather votes
   rpc RequestVote (RequestVoteRequest) returns (RequestVoteResponse);
 }
 
-message AppendEntriesRequest {
-  // Leaders term
-  uint32 term = 1;
-  // Leaders ID so followers can redirect clients
-  uint32 leader_id = 2;
-}
+/* message AppendEntriesRequest { */
+  // // Leaders term
+  // uint32 term = 1;
+  // // Leaders ID so followers can redirect clients
+  // uint32 leader_id = 2;
+// }
 
-message AppendEntriesResponse {
-  // Current term so leader can update itself
-  uint32 term = 1;
+// message AppendEntriesResponse {
+  // // Current term so leader can update itself
+  // uint32 term = 1;
 
-  // true if follower contained entry matching prevLogIndex and prevLogTerm,
-  // otherwise false
-  bool success = 2;
-}
+  // // true if follower contained entry matching prevLogIndex and prevLogTerm,
+  // // otherwise false
+  // bool success = 2;
+/* } */
 
 message RequestVoteRequest {
   // Candidate's term.
