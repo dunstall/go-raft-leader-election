@@ -1,10 +1,10 @@
 package node
 
 type nodeState interface {
-	Expire()
-	Elect()
+	Expire(node *Node)
+	Elect(node *Node)
 	// TODO(AD) Use callback with resp channel
-	ReceiveVoteRequest()
+	ReceiveVoteRequest(node *Node)
 	// TODO(AD) Use callback with resp channel
-	ReceiveAppendEntriesRequest()
+	ReceiveAppendEntriesRequest(node *Node)
 }

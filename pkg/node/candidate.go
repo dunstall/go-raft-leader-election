@@ -1,25 +1,24 @@
 package node
 
 type candidate struct {
-	node Node
 }
 
-func NewCandidate(node Node) nodeState {
-	return &candidate{node: node}
+func NewCandidate() nodeState {
+	return &candidate{}
 }
 
-func (c *candidate) Expire() {
+func (c *candidate) Expire(node *Node) {
 	// TODO(AD) -> Candidate
 }
 
-func (c *candidate) Elect() {
+func (c *candidate) Elect(node *Node) {
 	// TODO(AD) -> Leader
 }
 
-func (c *candidate) ReceiveVoteRequest() {
+func (c *candidate) ReceiveVoteRequest(node *Node) {
 	// TODO(AD)
 }
 
-func (c *candidate) ReceiveAppendEntriesRequest() {
+func (c *candidate) ReceiveAppendEntriesRequest(node *Node) {
 	// TODO(AD)
 }

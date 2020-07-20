@@ -1,25 +1,24 @@
 package node
 
 type leader struct {
-	node Node
 }
 
-func NewLeader(node Node) nodeState {
-	return &leader{node: node}
+func NewLeader() nodeState {
+	return &leader{}
 }
 
-func (l *leader) Expire() {
+func (l *leader) Expire(node *Node) {
 	// TODO(AD)
 }
 
-func (l *leader) Elect() {
+func (l *leader) Elect(node *Node) {
 	// TODO(AD)
 }
 
-func (l *leader) ReceiveVoteRequest() {
+func (l *leader) ReceiveVoteRequest(node *Node) {
 	// TODO(AD)
 }
 
-func (l *leader) ReceiveAppendEntriesRequest() {
+func (l *leader) ReceiveAppendEntriesRequest(node *Node) {
 	// TODO(AD)
 }

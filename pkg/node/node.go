@@ -9,31 +9,32 @@ type Node struct {
 }
 
 func NewNode() Node {
-	node := Node{}
+	follower := NewFollower()
+	candidate := NewCandidate()
+	leader := NewLeader()
 
-	node.follower = NewFollower(node)
-	node.candidate = NewCandidate(node)
-	node.leader = NewLeader(node)
-
-	node.state = node.follower
-
-	return node
+	return Node{
+		follower:  follower,
+		candidate: candidate,
+		leader:    leader,
+		state:     follower,
+	}
 }
 
 func (n *Node) Expire() {
-	n.state.Expire()
+	n.state.Expire(n)
 }
 
 func (n *Node) Elect() {
-	n.state.Elect()
+	n.state.Elect(n)
 }
 
 func (n *Node) ReceiveVoteRequest() {
-	n.state.ReceiveVoteRequest()
+	n.state.ReceiveVoteRequest(n)
 }
 
 func (n *Node) ReceiveAppendEntriesRequest() {
-	n.state.ReceiveAppendEntriesRequest()
+	n.state.ReceiveAppendEntriesRequest(n)
 }
 
 func (n *Node) followerState() nodeState {

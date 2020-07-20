@@ -5,28 +5,27 @@ import (
 )
 
 type Follower struct {
-	node Node
 }
 
-func NewFollower(node Node) nodeState {
-	return &Follower{node: node}
+func NewFollower() nodeState {
+	return &Follower{}
 }
 
-func (f *Follower) Expire() {
+func (f *Follower) Expire(node *Node) {
 	// TODO(AD)
 	fmt.Println("follower timed out")
-	f.node.setState(f.node.candidateState())
+	node.setState(node.candidateState())
 }
 
-func (f *Follower) Elect() {
+func (f *Follower) Elect(node *Node) {
 	// TODO(AD)
 	fmt.Println("cannot elect a follower")
 }
 
-func (f *Follower) ReceiveVoteRequest() {
+func (f *Follower) ReceiveVoteRequest(node *Node) {
 	// TODO(AD)
 }
 
-func (f *Follower) ReceiveAppendEntriesRequest() {
+func (f *Follower) ReceiveAppendEntriesRequest(node *Node) {
 	// TODO(AD)
 }
