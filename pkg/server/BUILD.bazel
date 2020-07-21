@@ -30,7 +30,7 @@ gomock(
 )
 
 go_library(
-    name = "go_mock_server_library",
+    name = "go_mock_library",
     srcs = ["mock_server.go"],
     importpath = "github.com/dunstall/goraft/pkg/server/mock_server",
     visibility = ["//visibility:public"],

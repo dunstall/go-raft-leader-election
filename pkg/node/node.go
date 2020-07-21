@@ -48,7 +48,7 @@ func (n *Node) Elect() {
 	n.state.Elect(n)
 }
 
-func (n *Node) VoteRequest(cb server.Callback) {
+func (n *Node) VoteRequest(cb server.VoteRequest) {
 	n.state.VoteRequest(n, cb)
 }
 

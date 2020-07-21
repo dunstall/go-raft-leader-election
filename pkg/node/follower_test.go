@@ -2,12 +2,9 @@ package node
 
 import (
 	"testing"
-	"time"
 
-	"github.com/dunstall/goraft/pkg/pb"
-	"github.com/dunstall/goraft/pkg/server"
-	"google.golang.org/protobuf/encoding/prototext"
-	"google.golang.org/protobuf/proto"
+	"github.com/dunstall/goraft/pkg/server/mock_server"
+	"github.com/golang/mock/gomock"
 )
 
 func TestFollowerExpire(t *testing.T) {
@@ -35,72 +32,29 @@ func TestFollowerInitialTerm(t *testing.T) {
 	}
 }
 
-func TestFollowerVoteRequestGreaterTerm(t *testing.T) {
-	var newTerm uint32 = 2
+func TestFollowerVoteRequest(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 
-	respChan := make(chan *pb.RequestVoteResponse)
-	cb := server.Callback{
-		&pb.RequestVoteRequest{
-			Term:        newTerm,
-			CandidateId: 0xff,
-		},
-		respChan,
-	}
+	var newTerm uint32 = 2
+	var candidateID uint32 = 0xff
+	mockreq := mock_server.NewMockVoteRequest(ctrl)
+	mockreq.EXPECT().CandidateID().AnyTimes().Return(candidateID)
+	mockreq.EXPECT().Term().AnyTimes().Return(newTerm)
 
 	node := NewNode()
-	go node.VoteRequest(cb)
 
-	expected := &pb.RequestVoteResponse{
-		Term:        newTerm,
-		VoteGranted: true,
-	}
+	// As the term is greater the request should be granted.
+	mockreq.EXPECT().Grant()
+	node.VoteRequest(mockreq)
 
-	select {
-	case resp := <-cb.RespChan:
-		if !proto.Equal(resp, expected) {
-			t.Errorf("%s != %s", prototext.Format(resp), prototext.Format(expected))
-		}
-	case <-time.After(10 * time.Millisecond):
-		t.Error("no vote response")
-	}
-
+	// Nodes term should have updated.
 	term := node.Term()
 	if term != newTerm {
 		t.Errorf("node.Term() != %d, actual %d", newTerm, term)
 	}
-}
 
-func TestFollowerVoteRequestLessTerm(t *testing.T) {
-	var newTerm uint32 = 0
-
-	respChan := make(chan *pb.RequestVoteResponse)
-	cb := server.Callback{
-		&pb.RequestVoteRequest{
-			Term:        newTerm,
-			CandidateId: 0xff,
-		},
-		respChan,
-	}
-
-	node := NewNode()
-	go node.VoteRequest(cb)
-
-	expected := &pb.RequestVoteResponse{
-		Term:        newTerm,
-		VoteGranted: false,
-	}
-
-	select {
-	case resp := <-cb.RespChan:
-		if !proto.Equal(resp, expected) {
-			t.Errorf("%s != %s", prototext.Format(resp), prototext.Format(expected))
-		}
-	case <-time.After(10 * time.Millisecond):
-		t.Error("no vote response")
-	}
-
-	term := node.Term()
-	if term != 1 {
-		t.Errorf("node.Term() != %d, actual %d", 1, term)
-	}
+	// The follower has given its vote for this term so should deny the request.
+	mockreq.EXPECT().Deny()
+	node.VoteRequest(mockreq)
 }

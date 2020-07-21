@@ -11,6 +11,7 @@ import (
 
 type VoteRequest interface {
 	Term() uint32
+	CandidateID() uint32
 	Grant()
 	Deny()
 }
@@ -22,6 +23,10 @@ type Callback struct {
 
 func (cb *Callback) Term() uint32 {
 	return cb.Request.Term
+}
+
+func (cb *Callback) CandidateID() uint32 {
+	return cb.Request.CandidateId
 }
 
 func (cb *Callback) Grant() {

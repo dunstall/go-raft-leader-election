@@ -23,7 +23,7 @@ func (l *leader) Elect(node *Node) {
 	log.Println("leader: leader already elected")
 }
 
-func (l *leader) VoteRequest(node *Node, cb server.Callback) {
+func (l *leader) VoteRequest(node *Node, cb server.VoteRequest) {
 	// TODO(AD)
 	log.Println("leader: leader received vote request")
 }

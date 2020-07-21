@@ -24,7 +24,7 @@ func (c *candidate) Elect(node *Node) {
 	node.setState(node.leaderState())
 }
 
-func (c *candidate) VoteRequest(node *Node, cb server.Callback) {
+func (c *candidate) VoteRequest(node *Node, cb server.VoteRequest) {
 	// TODO(AD)
 	log.Println("candidate: received vote request")
 }

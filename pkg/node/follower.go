@@ -5,8 +5,7 @@ import (
 	"github.com/golang/glog"
 )
 
-type follower struct {
-}
+type follower struct{}
 
 func NewFollower() nodeState {
 	return &follower{}
@@ -21,15 +20,18 @@ func (f *follower) Elect(node *Node) {
 	glog.Warning("follower: cannot elect a follower")
 }
 
-func (f *follower) VoteRequest(node *Node, cb server.Callback) {
-	glog.Info("follower: received vote request")
-	if cb.Term() > node.Term() {
-		glog.Infof("follower: moving to term %d", cb.Request.Term)
-		node.SetTerm(cb.Term())
-		cb.Grant()
+func (f *follower) VoteRequest(node *Node, req server.VoteRequest) {
+	glog.Infof("follower: received vote request from candidate %d", req.CandidateID())
+
+	if req.Term() > node.Term() {
+		node.SetTerm(req.Term())
+		req.Grant()
+
+		glog.Infof("follower: granted vote request with term %d", req.Term())
 	} else {
-		glog.Warningf("follower: vote request has old term %d", cb.Request.Term)
-		cb.Deny()
+		req.Deny()
+
+		glog.Infof("follower: denied vote request with term %d", req.Term())
 	}
 }
 
