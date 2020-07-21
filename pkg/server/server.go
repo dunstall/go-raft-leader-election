@@ -9,6 +9,12 @@ import (
 	"google.golang.org/grpc"
 )
 
+type VoteRequest interface {
+	Term() uint32
+	Grant()
+	Deny()
+}
+
 type Callback struct {
 	Request  *pb.RequestVoteRequest
 	RespChan chan *pb.RequestVoteResponse
