@@ -1,7 +1,7 @@
 package node
 
 import (
-	"fmt"
+	"log"
 )
 
 type Follower struct {
@@ -12,20 +12,20 @@ func NewFollower() nodeState {
 }
 
 func (f *Follower) Expire(node *Node) {
-	// TODO(AD)
-	fmt.Println("follower timed out")
+	log.Println("follower: node timed out")
 	node.setState(node.candidateState())
 }
 
 func (f *Follower) Elect(node *Node) {
-	// TODO(AD)
-	fmt.Println("cannot elect a follower")
+	log.Println("follower: cannot elect a follower")
 }
 
 func (f *Follower) ReceiveVoteRequest(node *Node) {
 	// TODO(AD)
+	log.Println("follower: received vote request")
 }
 
 func (f *Follower) ReceiveAppendEntriesRequest(node *Node) {
 	// TODO(AD)
+	log.Println("follower: received append entries request")
 }
