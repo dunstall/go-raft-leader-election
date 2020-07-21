@@ -1,5 +1,9 @@
 package node
 
+import (
+	"github.com/dunstall/goraft/pkg/server"
+)
+
 type Node struct {
 	follower  nodeState
 	candidate nodeState
@@ -29,12 +33,12 @@ func (n *Node) Elect() {
 	n.state.Elect(n)
 }
 
-func (n *Node) ReceiveVoteRequest() {
-	n.state.ReceiveVoteRequest(n)
+func (n *Node) VoteRequest(cb server.Callback) {
+	n.state.VoteRequest(n, cb)
 }
 
-func (n *Node) ReceiveAppendEntriesRequest() {
-	n.state.ReceiveAppendEntriesRequest(n)
+func (n *Node) AppendEntriesRequest() {
+	n.state.AppendEntriesRequest(n)
 }
 
 func (n *Node) followerState() nodeState {

@@ -2,6 +2,8 @@ package node
 
 import (
 	"log"
+
+	"github.com/dunstall/goraft/pkg/server"
 )
 
 type candidate struct {
@@ -22,12 +24,12 @@ func (c *candidate) Elect(node *Node) {
 	node.setState(node.leaderState())
 }
 
-func (c *candidate) ReceiveVoteRequest(node *Node) {
+func (c *candidate) VoteRequest(node *Node, cb server.Callback) {
 	// TODO(AD)
 	log.Println("candidate: received vote request")
 }
 
-func (c *candidate) ReceiveAppendEntriesRequest(node *Node) {
+func (c *candidate) AppendEntriesRequest(node *Node) {
 	// TODO(AD)
 	log.Println("candidate: received append entries request")
 }
