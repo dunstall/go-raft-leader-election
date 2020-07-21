@@ -1,9 +1,8 @@
 package node
 
 import (
-	"log"
-
 	"github.com/dunstall/goraft/pkg/server"
+	"github.com/golang/glog"
 )
 
 type candidate struct {
@@ -14,22 +13,31 @@ func NewCandidate() nodeState {
 }
 
 func (c *candidate) Expire(node *Node) {
-	// TODO(AD) -> Candidate
-	log.Println("candidate: node timed out")
+	glog.Infof("candidate: node timed out in term %d", node.Term())
+	node.SetTerm(node.Term() + 1)
 }
 
 func (c *candidate) Elect(node *Node) {
-	// TODO(AD) -> Leader
-	log.Println("candidate: node elected")
+	glog.Infof("candidate: node elected in term %d", node.Term())
 	node.setState(node.leaderState())
 }
 
-func (c *candidate) VoteRequest(node *Node, cb server.VoteRequest) {
-	// TODO(AD)
-	log.Println("candidate: received vote request")
+func (c *candidate) VoteRequest(node *Node, req server.VoteRequest) {
+	glog.Infof("candidate: received vote request from candidate %d", req.CandidateID())
+
+	if req.Term() > node.Term() {
+		glog.Infof("candidate: vote request has greater term %d - reverting to follower", req.Term())
+
+		node.setState(node.followerState())
+		node.VoteRequest(req)
+	} else {
+		req.Deny()
+
+		glog.Infof("candidate: denied vote request with term %d", req.Term())
+	}
 }
 
 func (c *candidate) AppendEntriesRequest(node *Node) {
 	// TODO(AD)
-	log.Println("candidate: received append entries request")
+	glog.Info("candidate: received append entries request")
 }

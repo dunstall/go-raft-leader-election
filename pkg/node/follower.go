@@ -12,7 +12,9 @@ func NewFollower() nodeState {
 }
 
 func (f *follower) Expire(node *Node) {
-	glog.Info("follower: node timed out")
+	// TODO(AD) Logs should have format <state> <node ID>: msg. Can make this
+	// a method of node.
+	glog.Infof("follower: node timed out in term %d", node.Term())
 	node.SetTerm(node.Term() + 1)
 	node.setState(node.candidateState())
 }

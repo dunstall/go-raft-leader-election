@@ -19,14 +19,13 @@ go_library(
 
 go_test(
     name = "go_default_test",
-    srcs = ["follower_test.go"],
+    srcs = [
+        "candidate_test.go",
+        "follower_test.go",
+    ],
     embed = [":go_default_library"],
     deps = [
-        "//pkg/pb:go_default_library",
-        "//pkg/server:go_default_library",
         "//pkg/server:go_mock_library",
         "@com_github_golang_mock//gomock:go_default_library",
-        "@org_golang_google_protobuf//encoding/prototext:go_default_library",
-        "@org_golang_google_protobuf//proto:go_default_library",
     ],
 )
