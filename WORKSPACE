@@ -98,3 +98,10 @@ git_repository(
     remote = "https://github.com/jmhodges/bazel_gomock",
     shallow_since = "1578954001 -0800",
 )
+
+go_repository(
+    name = "com_github_golang_glog",
+    importpath = "github.com/golang/glog",
+    sum = "h1:VKtxabqXZkF25pY9ekfRL6a582T4P37/31XEstQ5p58=",
+    version = "v0.0.0-20160126235308-23def4e6c14b",
+)

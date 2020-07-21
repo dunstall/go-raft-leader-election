@@ -11,5 +11,8 @@ go_library(
     ],
     importpath = "github.com/dunstall/goraft/pkg/node",
     visibility = ["//visibility:public"],
-    deps = ["//pkg/server:go_default_library"],
+    deps = [
+        "//pkg/server:go_default_library",
+        "@com_github_golang_glog//:go_default_library",
+    ],
 )
