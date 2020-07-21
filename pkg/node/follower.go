@@ -13,6 +13,7 @@ func NewFollower() nodeState {
 
 func (f *follower) Expire(node *Node) {
 	glog.Info("follower: node timed out")
+	node.SetTerm(node.Term() + 1)
 	node.setState(node.candidateState())
 }
 

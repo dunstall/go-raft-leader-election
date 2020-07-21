@@ -7,11 +7,27 @@ import (
 	"github.com/golang/mock/gomock"
 )
 
+func TestFollowerInitialTerm(t *testing.T) {
+	node := NewNode()
+	var expected uint32 = 1
+	actual := node.Term()
+	if actual != expected {
+		t.Errorf("node.Term() != %d, actual %d", expected, actual)
+	}
+}
+
 func TestFollowerExpire(t *testing.T) {
 	node := NewNode()
 	node.Expire()
 	if node.state != node.candidateState() {
 		t.Error("expected node to be in candidate state")
+	}
+
+	// The node should have entered a new term.
+	var expected uint32 = 2
+	actual := node.Term()
+	if actual != expected {
+		t.Errorf("node.Term() != %d, actual %d", expected, actual)
 	}
 }
 
@@ -20,15 +36,6 @@ func TestFollowerElect(t *testing.T) {
 	node.Elect()
 	if node.state != node.followerState() {
 		t.Error("expected node to be in follower state")
-	}
-}
-
-func TestFollowerInitialTerm(t *testing.T) {
-	node := NewNode()
-	var expected uint32 = 1
-	actual := node.Term()
-	if actual != expected {
-		t.Error("node.Term() != %d, actual %d", expected, actual)
 	}
 }
 
