@@ -2,7 +2,7 @@ package node
 
 import (
 	"github.com/dunstall/goraft/pkg/server"
-  "github.com/golang/glog"
+	"github.com/golang/glog"
 )
 
 type follower struct {
@@ -22,8 +22,15 @@ func (f *follower) Elect(node *Node) {
 }
 
 func (f *follower) VoteRequest(node *Node, cb server.Callback) {
-	// TODO(AD)
 	glog.Info("follower: received vote request")
+	if cb.Term() > node.Term() {
+		glog.Infof("follower: moving to term %d", cb.Request.Term)
+		node.SetTerm(cb.Term())
+		cb.Grant()
+	} else {
+		glog.Warningf("follower: vote request has old term %d", cb.Request.Term)
+		cb.Deny()
+	}
 }
 
 func (f *follower) AppendEntriesRequest(node *Node) {

@@ -4,7 +4,13 @@ import (
 	"github.com/dunstall/goraft/pkg/server"
 )
 
+const (
+	initialTerm = 1
+)
+
 type Node struct {
+	term uint32
+
 	follower  nodeState
 	candidate nodeState
 	leader    nodeState
@@ -18,11 +24,20 @@ func NewNode() Node {
 	leader := NewLeader()
 
 	return Node{
+		term:      initialTerm,
 		follower:  follower,
 		candidate: candidate,
 		leader:    leader,
 		state:     follower,
 	}
+}
+
+func (n *Node) Term() uint32 {
+	return n.term
+}
+
+func (n *Node) SetTerm(term uint32) {
+	n.term = term
 }
 
 func (n *Node) Expire() {
