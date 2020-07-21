@@ -1,20 +1,12 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
-    srcs = [
-        "node.go",
-        "term.go",
-    ],
+    srcs = ["raft.go"],
     importpath = "github.com/dunstall/goraft/pkg/raft",
     visibility = ["//visibility:public"],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "node_test.go",
-        "term_test.go",
+    deps = [
+        "//pkg/node:go_default_library",
+        "//pkg/server:go_default_library",
     ],
-    embed = [":go_default_library"],
 )
