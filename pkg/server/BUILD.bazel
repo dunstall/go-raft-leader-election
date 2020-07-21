@@ -2,10 +2,7 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
-    srcs = [
-        "server.go",
-        "serverb.go",
-    ],
+    srcs = ["server.go"],
     importpath = "github.com/dunstall/goraft/pkg/server",
     visibility = ["//visibility:public"],
     deps = [
