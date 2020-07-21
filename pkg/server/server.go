@@ -14,6 +14,24 @@ type Callback struct {
 	RespChan chan *pb.RequestVoteResponse
 }
 
+func (cb *Callback) Term() uint32 {
+	return cb.Request.Term
+}
+
+func (cb *Callback) Grant() {
+	cb.RespChan <- &pb.RequestVoteResponse{
+		Term:        cb.Request.Term,
+		VoteGranted: true,
+	}
+}
+
+func (cb *Callback) Deny() {
+	cb.RespChan <- &pb.RequestVoteResponse{
+		Term:        cb.Request.Term,
+		VoteGranted: false,
+	}
+}
+
 type Server struct {
 	VoteRequests chan Callback
 }
