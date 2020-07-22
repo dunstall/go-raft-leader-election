@@ -9,4 +9,6 @@ type nodeState interface {
 	Elect(node *Node)
 	VoteRequest(node *Node, cb server.VoteRequest)
 	AppendEntriesRequest(node *Node)
+
+	name() string
 }

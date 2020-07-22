@@ -16,7 +16,7 @@ func TestCandidateExpire(t *testing.T) {
 	elector := mock_elector.NewMockElector(ctrl)
 	elector.EXPECT().Elect(expectedTerm)
 
-	node := NewNode(elector)
+	node := NewNode(0xfa, elector)
 	node.setState(node.candidateState())
 
 	node.Expire()
@@ -35,7 +35,7 @@ func TestCandidateElect(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	node := NewNode(mock_elector.NewMockElector(ctrl))
+	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl))
 	node.setState(node.candidateState())
 
 	node.Elect()
@@ -55,7 +55,7 @@ func TestCandidateVoteRequestTermGreater(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	node := NewNode(mock_elector.NewMockElector(ctrl))
+	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl))
 	node.setState(node.candidateState())
 
 	var newTerm uint32 = node.Term() + 1
@@ -84,7 +84,7 @@ func TestCandidateVoteRequestTermEqual(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	node := NewNode(mock_elector.NewMockElector(ctrl))
+	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl))
 	node.setState(node.candidateState())
 
 	var newTerm uint32 = node.Term()
