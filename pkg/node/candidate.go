@@ -18,7 +18,7 @@ func (c *candidate) Expire(node *Node) {
 }
 
 func (c *candidate) Elect(node *Node) {
-	glog.Warning(node.logFormat("node elected"))
+	glog.Info(node.logFormat("node elected"))
 	node.setState(node.leaderState())
 }
 
