@@ -5,6 +5,7 @@ import (
 
 	"github.com/dunstall/goraft/pkg/elector"
 	"github.com/dunstall/goraft/pkg/server"
+	"github.com/golang/glog"
 )
 
 const (
@@ -15,28 +16,17 @@ type Node struct {
 	id   uint32
 	term uint32
 
-	follower  nodeState
-	candidate nodeState
-	leader    nodeState
-
 	state nodeState
 
 	elector elector.Elector
 }
 
 func NewNode(id uint32, elector elector.Elector) Node {
-	follower := NewFollower()
-	candidate := NewCandidate()
-	leader := NewLeader()
-
 	return Node{
-		id:        id,
-		term:      initialTerm,
-		follower:  follower,
-		candidate: candidate,
-		leader:    leader,
-		state:     follower,
-		elector:   elector,
+		id:      id,
+		term:    initialTerm,
+		state:   NewFollower(),
+		elector: elector,
 	}
 }
 
@@ -48,32 +38,28 @@ func (n *Node) SetTerm(term uint32) {
 	n.term = term
 }
 
+func (n *Node) IncTerm() {
+	n.term++
+}
+
 func (n *Node) Expire() {
+	glog.Info(n.logFormat("node expired"))
 	n.state.Expire(n)
 }
 
 func (n *Node) Elect() {
+	glog.Info(n.logFormat("node elected"))
 	n.state.Elect(n)
 }
 
-func (n *Node) VoteRequest(cb server.VoteRequest) {
-	n.state.VoteRequest(n, cb)
+func (n *Node) VoteRequest(req server.VoteRequest) {
+	glog.Infof(n.logFormat("received vote request from candidate %d"), req.CandidateID())
+	n.state.VoteRequest(n, req)
 }
 
 func (n *Node) AppendEntriesRequest() {
+	glog.Info(n.logFormat("received append entries request"))
 	n.state.AppendEntriesRequest(n)
-}
-
-func (n *Node) followerState() nodeState {
-	return n.follower
-}
-
-func (n *Node) candidateState() nodeState {
-	return n.candidate
-}
-
-func (n *Node) leaderState() nodeState {
-	return n.leader
 }
 
 func (n *Node) Elector() elector.Elector {

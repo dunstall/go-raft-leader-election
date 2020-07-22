@@ -30,7 +30,7 @@ func TestFollowerExpire(t *testing.T) {
 
 	node := NewNode(0xfa, elector)
 	node.Expire()
-	if node.state != node.candidateState() {
+	if node.state.name() != candidateName {
 		t.Error("expected node to be in candidate state")
 	}
 
@@ -47,7 +47,7 @@ func TestFollowerElect(t *testing.T) {
 
 	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl))
 	node.Elect()
-	if node.state != node.followerState() {
+	if node.state.name() != followerName {
 		t.Error("expected node to be in follower state")
 	}
 }

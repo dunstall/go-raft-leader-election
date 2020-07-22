@@ -13,10 +13,10 @@ func TestLeaderExpire(t *testing.T) {
 	defer ctrl.Finish()
 
 	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl))
-	node.setState(node.leaderState())
+	node.setState(NewLeader())
 
 	node.Expire()
-	if node.state != node.followerState() {
+	if node.state.name() != followerName {
 		t.Error("expected node to be in follower state")
 	}
 
@@ -33,10 +33,10 @@ func TestLeaderElect(t *testing.T) {
 	defer ctrl.Finish()
 
 	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl))
-	node.setState(node.leaderState())
+	node.setState(NewLeader())
 
 	node.Elect()
-	if node.state != node.leaderState() {
+	if node.state.name() != leaderName {
 		t.Error("expected node to be in leader state")
 	}
 
@@ -53,7 +53,7 @@ func TestLeaderVoteRequestTermGreater(t *testing.T) {
 	defer ctrl.Finish()
 
 	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl))
-	node.setState(node.leaderState())
+	node.setState(NewLeader())
 
 	var newTerm uint32 = node.Term() + 1
 	var candidateID uint32 = 0xff
@@ -67,7 +67,7 @@ func TestLeaderVoteRequestTermGreater(t *testing.T) {
 	mockreq.EXPECT().Grant()
 	node.VoteRequest(mockreq)
 
-	if node.state != node.followerState() {
+	if node.state.name() != followerName {
 		t.Error("expected node to be in follower state")
 	}
 
@@ -82,7 +82,7 @@ func TestLeaderVoteRequestTermEqual(t *testing.T) {
 	defer ctrl.Finish()
 
 	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl))
-	node.setState(node.leaderState())
+	node.setState(NewLeader())
 
 	var newTerm uint32 = node.Term()
 	var candidateID uint32 = 0xff
@@ -95,7 +95,7 @@ func TestLeaderVoteRequestTermEqual(t *testing.T) {
 	mockreq.EXPECT().Deny()
 	node.VoteRequest(mockreq)
 
-	if node.state != node.leaderState() {
+	if node.state.name() != leaderName {
 		t.Error("expected node to be in leader state")
 	}
 	term := node.Term()

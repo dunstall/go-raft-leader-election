@@ -16,23 +16,19 @@ func NewCandidate() nodeState {
 }
 
 func (c *candidate) Expire(node *Node) {
-	glog.Info(node.logFormat("node timed out"))
-	node.SetTerm(node.Term() + 1)
+	node.IncTerm()
 	node.Elector().Elect(node.Term())
 }
 
 func (c *candidate) Elect(node *Node) {
-	glog.Info(node.logFormat("node elected"))
-	node.setState(node.leaderState())
+	node.setState(NewLeader())
 }
 
 func (c *candidate) VoteRequest(node *Node, req server.VoteRequest) {
-	glog.Infof(node.logFormat("received vote request from candidate %d"), req.CandidateID())
-
 	if req.Term() > node.Term() {
-		glog.Infof(node.logFormat("granted vote request with term %d"), req.Term())
+		glog.Infof(node.logFormat("reverting to follower"))
 
-		node.setState(node.followerState())
+		node.setState(NewFollower())
 		node.VoteRequest(req)
 	} else {
 		req.Deny()
@@ -43,7 +39,6 @@ func (c *candidate) VoteRequest(node *Node, req server.VoteRequest) {
 
 func (c *candidate) AppendEntriesRequest(node *Node) {
 	// TODO(AD)
-	glog.Infof(node.logFormat("received append entries request"))
 }
 
 func (c *candidate) name() string {
