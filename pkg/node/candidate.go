@@ -15,6 +15,7 @@ func NewCandidate() nodeState {
 func (c *candidate) Expire(node *Node) {
 	glog.Infof("candidate: node timed out in term %d", node.Term())
 	node.SetTerm(node.Term() + 1)
+	node.Elector().Elect(node.Term())
 }
 
 func (c *candidate) Elect(node *Node) {

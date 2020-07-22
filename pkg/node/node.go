@@ -1,6 +1,7 @@
 package node
 
 import (
+	"github.com/dunstall/goraft/pkg/elector"
 	"github.com/dunstall/goraft/pkg/server"
 )
 
@@ -16,9 +17,11 @@ type Node struct {
 	leader    nodeState
 
 	state nodeState
+
+	elector elector.Elector
 }
 
-func NewNode() Node {
+func NewNode(elector elector.Elector) Node {
 	follower := NewFollower()
 	candidate := NewCandidate()
 	leader := NewLeader()
@@ -29,6 +32,7 @@ func NewNode() Node {
 		candidate: candidate,
 		leader:    leader,
 		state:     follower,
+		elector:   elector,
 	}
 }
 
@@ -66,6 +70,10 @@ func (n *Node) candidateState() nodeState {
 
 func (n *Node) leaderState() nodeState {
 	return n.leader
+}
+
+func (n *Node) Elector() elector.Elector {
+	return n.elector
 }
 
 func (n *Node) setState(state nodeState) {

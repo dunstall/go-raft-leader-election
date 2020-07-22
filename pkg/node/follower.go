@@ -17,6 +17,7 @@ func (f *follower) Expire(node *Node) {
 	glog.Infof("follower: node timed out in term %d", node.Term())
 	node.SetTerm(node.Term() + 1)
 	node.setState(node.candidateState())
+	node.Elector().Elect(node.Term())
 }
 
 func (f *follower) Elect(node *Node) {

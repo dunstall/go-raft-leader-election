@@ -3,12 +3,16 @@ package node
 import (
 	"testing"
 
+	"github.com/dunstall/goraft/pkg/elector/mock_elector"
 	"github.com/dunstall/goraft/pkg/server/mock_server"
 	"github.com/golang/mock/gomock"
 )
 
 func TestFollowerInitialTerm(t *testing.T) {
-	node := NewNode()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	node := NewNode(mock_elector.NewMockElector(ctrl))
 	var expected uint32 = 1
 	actual := node.Term()
 	if actual != expected {
@@ -17,22 +21,31 @@ func TestFollowerInitialTerm(t *testing.T) {
 }
 
 func TestFollowerExpire(t *testing.T) {
-	node := NewNode()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	var expectedTerm uint32 = 2
+	elector := mock_elector.NewMockElector(ctrl)
+	elector.EXPECT().Elect(expectedTerm)
+
+	node := NewNode(elector)
 	node.Expire()
 	if node.state != node.candidateState() {
 		t.Error("expected node to be in candidate state")
 	}
 
 	// The node should have entered a new term.
-	var expected uint32 = 2
 	actual := node.Term()
-	if actual != expected {
-		t.Errorf("node.Term() != %d, actual %d", expected, actual)
+	if actual != expectedTerm {
+		t.Errorf("node.Term() != %d, actual %d", expectedTerm, actual)
 	}
 }
 
 func TestFollowerElect(t *testing.T) {
-	node := NewNode()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	node := NewNode(mock_elector.NewMockElector(ctrl))
 	node.Elect()
 	if node.state != node.followerState() {
 		t.Error("expected node to be in follower state")
@@ -49,7 +62,7 @@ func TestFollowerVoteRequest(t *testing.T) {
 	mockreq.EXPECT().CandidateID().AnyTimes().Return(candidateID)
 	mockreq.EXPECT().Term().AnyTimes().Return(newTerm)
 
-	node := NewNode()
+	node := NewNode(mock_elector.NewMockElector(ctrl))
 
 	// As the term is greater the request should be granted.
 	mockreq.EXPECT().Grant()

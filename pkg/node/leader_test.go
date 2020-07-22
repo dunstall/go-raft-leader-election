@@ -3,12 +3,16 @@ package node
 import (
 	"testing"
 
+	"github.com/dunstall/goraft/pkg/elector/mock_elector"
 	"github.com/dunstall/goraft/pkg/server/mock_server"
 	"github.com/golang/mock/gomock"
 )
 
 func TestLeaderExpire(t *testing.T) {
-	node := NewNode()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	node := NewNode(mock_elector.NewMockElector(ctrl))
 	node.setState(node.leaderState())
 
 	node.Expire()
@@ -25,7 +29,10 @@ func TestLeaderExpire(t *testing.T) {
 }
 
 func TestLeaderElect(t *testing.T) {
-	node := NewNode()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	node := NewNode(mock_elector.NewMockElector(ctrl))
 	node.setState(node.leaderState())
 
 	node.Elect()
@@ -45,7 +52,7 @@ func TestLeaderVoteRequestTermGreater(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	node := NewNode()
+	node := NewNode(mock_elector.NewMockElector(ctrl))
 	node.setState(node.leaderState())
 
 	var newTerm uint32 = node.Term() + 1
@@ -74,7 +81,7 @@ func TestLeaderVoteRequestTermEqual(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	node := NewNode()
+	node := NewNode(mock_elector.NewMockElector(ctrl))
 	node.setState(node.leaderState())
 
 	var newTerm uint32 = node.Term()
