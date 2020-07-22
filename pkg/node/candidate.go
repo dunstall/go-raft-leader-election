@@ -5,6 +5,10 @@ import (
 	"github.com/golang/glog"
 )
 
+const (
+	candidateName = "candidate"
+)
+
 type candidate struct{}
 
 func NewCandidate() nodeState {
@@ -43,5 +47,5 @@ func (c *candidate) AppendEntriesRequest(node *Node) {
 }
 
 func (c *candidate) name() string {
-	return "candidate"
+	return candidateName
 }

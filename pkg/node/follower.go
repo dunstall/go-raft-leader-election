@@ -5,6 +5,10 @@ import (
 	"github.com/golang/glog"
 )
 
+const (
+	followerName = "follower"
+)
+
 type follower struct{}
 
 func NewFollower() nodeState {
@@ -43,5 +47,5 @@ func (f *follower) AppendEntriesRequest(node *Node) {
 }
 
 func (f *follower) name() string {
-	return "follower"
+	return followerName
 }

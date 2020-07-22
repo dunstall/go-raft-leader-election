@@ -5,6 +5,10 @@ import (
 	"github.com/golang/glog"
 )
 
+const (
+	leaderName = "leader"
+)
+
 type leader struct{}
 
 func NewLeader() nodeState {
@@ -42,5 +46,5 @@ func (l *leader) AppendEntriesRequest(node *Node) {
 }
 
 func (l *leader) name() string {
-	return "leader"
+	return leaderName
 }
