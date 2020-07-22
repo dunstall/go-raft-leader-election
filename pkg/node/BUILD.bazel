@@ -22,6 +22,7 @@ go_test(
     srcs = [
         "candidate_test.go",
         "follower_test.go",
+        "leader_test.go",
     ],
     embed = [":go_default_library"],
     deps = [
