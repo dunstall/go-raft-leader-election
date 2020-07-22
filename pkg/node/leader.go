@@ -5,8 +5,7 @@ import (
 	"github.com/golang/glog"
 )
 
-type leader struct {
-}
+type leader struct{}
 
 func NewLeader() nodeState {
 	return &leader{}

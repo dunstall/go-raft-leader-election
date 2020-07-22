@@ -5,8 +5,7 @@ import (
 	"github.com/golang/glog"
 )
 
-type candidate struct {
-}
+type candidate struct{}
 
 func NewCandidate() nodeState {
 	return &candidate{}
