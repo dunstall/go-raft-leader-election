@@ -5,6 +5,10 @@ import (
 	"github.com/golang/glog"
 )
 
+const (
+	candidateName = "candidate"
+)
+
 type candidate struct{}
 
 func NewCandidate() nodeState {
@@ -12,32 +16,36 @@ func NewCandidate() nodeState {
 }
 
 func (c *candidate) Expire(node *Node) {
-	glog.Infof("candidate: node timed out in term %d", node.Term())
+	glog.Info(node.logFormat("node timed out"))
 	node.SetTerm(node.Term() + 1)
 	node.Elector().Elect(node.Term())
 }
 
 func (c *candidate) Elect(node *Node) {
-	glog.Infof("candidate: node elected in term %d", node.Term())
+	glog.Info(node.logFormat("node elected"))
 	node.setState(node.leaderState())
 }
 
 func (c *candidate) VoteRequest(node *Node, req server.VoteRequest) {
-	glog.Infof("candidate: received vote request from candidate %d", req.CandidateID())
+	glog.Infof(node.logFormat("received vote request from candidate %d"), req.CandidateID())
 
 	if req.Term() > node.Term() {
-		glog.Infof("candidate: vote request has greater term %d - reverting to follower", req.Term())
+		glog.Infof(node.logFormat("granted vote request with term %d"), req.Term())
 
 		node.setState(node.followerState())
 		node.VoteRequest(req)
 	} else {
 		req.Deny()
 
-		glog.Infof("candidate: denied vote request with term %d", req.Term())
+		glog.Infof(node.logFormat("denied vote request with term %d"), req.Term())
 	}
 }
 
 func (c *candidate) AppendEntriesRequest(node *Node) {
 	// TODO(AD)
-	glog.Info("candidate: received append entries request")
+	glog.Infof(node.logFormat("received append entries request"))
+}
+
+func (c *candidate) name() string {
+	return candidateName
 }

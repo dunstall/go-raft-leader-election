@@ -1,6 +1,8 @@
 package node
 
 import (
+	"fmt"
+
 	"github.com/dunstall/goraft/pkg/elector"
 	"github.com/dunstall/goraft/pkg/server"
 )
@@ -10,6 +12,7 @@ const (
 )
 
 type Node struct {
+	id   uint32
 	term uint32
 
 	follower  nodeState
@@ -21,12 +24,13 @@ type Node struct {
 	elector elector.Elector
 }
 
-func NewNode(elector elector.Elector) Node {
+func NewNode(id uint32, elector elector.Elector) Node {
 	follower := NewFollower()
 	candidate := NewCandidate()
 	leader := NewLeader()
 
 	return Node{
+		id:        id,
 		term:      initialTerm,
 		follower:  follower,
 		candidate: candidate,
@@ -78,4 +82,8 @@ func (n *Node) Elector() elector.Elector {
 
 func (n *Node) setState(state nodeState) {
 	n.state = state
+}
+
+func (n *Node) logFormat(msg string) string {
+	return fmt.Sprintf("%s %d %d: %s", n.state.name(), n.id, n.Term(), msg)
 }

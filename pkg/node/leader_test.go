@@ -12,7 +12,7 @@ func TestLeaderExpire(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	node := NewNode(mock_elector.NewMockElector(ctrl))
+	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl))
 	node.setState(node.leaderState())
 
 	node.Expire()
@@ -32,7 +32,7 @@ func TestLeaderElect(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	node := NewNode(mock_elector.NewMockElector(ctrl))
+	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl))
 	node.setState(node.leaderState())
 
 	node.Elect()
@@ -52,7 +52,7 @@ func TestLeaderVoteRequestTermGreater(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	node := NewNode(mock_elector.NewMockElector(ctrl))
+	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl))
 	node.setState(node.leaderState())
 
 	var newTerm uint32 = node.Term() + 1
@@ -81,7 +81,7 @@ func TestLeaderVoteRequestTermEqual(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	node := NewNode(mock_elector.NewMockElector(ctrl))
+	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl))
 	node.setState(node.leaderState())
 
 	var newTerm uint32 = node.Term()
