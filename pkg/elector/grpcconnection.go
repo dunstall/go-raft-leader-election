@@ -19,10 +19,11 @@ type GRPCConnection struct {
 	conn   *grpc.ClientConn
 }
 
-func NewGRPCConnection(conn *grpc.ClientConn) GRPCConnection {
-	return GRPCConnection{client: pb.NewRaftClient(conn), conn: conn}
+func NewGRPCConnection(conn *grpc.ClientConn) Connection {
+	return &GRPCConnection{client: pb.NewRaftClient(conn), conn: conn}
 }
 
+// TODO(AD) This must handle reconnect
 func (conn *GRPCConnection) RequestVote(term uint32) bool {
 	req := &pb.RequestVoteRequest{
 		Term:        term,
