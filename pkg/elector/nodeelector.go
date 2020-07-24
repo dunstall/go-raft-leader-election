@@ -39,6 +39,12 @@ func (e *NodeElector) Elect(term uint32) bool {
 	return e.isMajority(int(votes))
 }
 
+func (e *NodeElector) Close() {
+	for _, conn := range e.conns {
+		conn.Close()
+	}
+}
+
 func (e *NodeElector) isMajority(votes int) bool {
 	// As the node always votes for itself need at least floor(n/2) other nodes.
 	return votes >= (len(e.conns) / 2)
