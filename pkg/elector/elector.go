@@ -9,7 +9,4 @@ type Elector interface {
 
 	// Elected returns the results of elections.
 	Elected() <-chan bool
-
-	// Close closes the elector.
-	Close()
 }
