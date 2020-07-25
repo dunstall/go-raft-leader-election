@@ -24,7 +24,6 @@ func NewGRPCConnection(conn *grpc.ClientConn, id uint32) Connection {
 	return &GRPCConnection{client: pb.NewRaftClient(conn), conn: conn, id: id}
 }
 
-// TODO(AD) This must handle reconnect
 func (conn *GRPCConnection) RequestVote(term uint32) bool {
 	req := &pb.RequestVoteRequest{
 		Term:        term,

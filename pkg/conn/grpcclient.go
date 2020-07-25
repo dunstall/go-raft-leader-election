@@ -16,10 +16,11 @@ func NewGRPCClient(id uint32) Client {
 }
 
 func (c *GRPCClient) Dial(addr string) Connection {
-	// TODO(AD) Ensure this is all background so should never return an error.
 	conn, err := grpc.Dial(addr, grpc.WithInsecure())
 	if err != nil {
-		glog.Fatalf("")
+		// As the connection is in the background this should never happen so crash
+		// early.
+		glog.Fatalf("failed to Dial the node at %s: %s", addr, err)
 	}
 	return NewGRPCConnection(conn, c.id)
 }
