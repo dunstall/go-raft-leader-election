@@ -32,7 +32,7 @@ func (c *candidate) VoteRequest(node *Node, req server.VoteRequest) {
 	}
 }
 
-func (c *candidate) AppendRequest(node *Node) {
+func (c *candidate) AppendRequest(node *Node, req server.AppendRequest) {
 	// TODO(AD)
 }
 

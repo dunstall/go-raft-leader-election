@@ -31,7 +31,7 @@ func (l *leader) VoteRequest(node *Node, req server.VoteRequest) {
 	}
 }
 
-func (l *leader) AppendRequest(node *Node) {
+func (l *leader) AppendRequest(node *Node, req server.AppendRequest) {
 	// TODO(AD)
 }
 
