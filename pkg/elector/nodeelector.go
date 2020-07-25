@@ -4,7 +4,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-  "github.com/dunstall/goraft/pkg/elector/conn"
+	"github.com/dunstall/goraft/pkg/elector/conn"
 )
 
 // NodeElector implements Elector by requesting votes from all nodes in the
