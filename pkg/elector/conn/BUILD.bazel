@@ -1,0 +1,56 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    # Required to avoid gazelle including mocks.
+    srcs = glob(
+        # keep
+        ["*.go"],
+        exclude = [
+            "*_test.go",
+            "mock*.go",
+        ],
+    ),
+    importpath = "github.com/dunstall/goraft/pkg/elector/conn",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//pkg/pb:go_default_library",
+        "@com_github_golang_glog//:go_default_library",
+        "@org_golang_google_grpc//:go_default_library",
+    ],
+)
+
+load("@gomock_rules//:gomock.bzl", "gomock")
+
+gomock(
+    name = "mock_client",
+    out = "mock_client.go",
+    interfaces = ["Client"],
+    library = "//pkg/elector/conn:go_default_library",
+    package = "mock_conn",
+)
+
+load("@gomock_rules//:gomock.bzl", "gomock")
+
+gomock(
+    name = "mock_connection",
+    out = "mock_connection.go",
+    interfaces = ["Connection"],
+    library = "//pkg/elector/conn:go_default_library",
+    package = "mock_conn",
+)
+
+go_library(
+    name = "go_mock_library",
+    srcs = [
+        "mock_client.go",
+        "mock_connection.go",
+    ],
+    importpath = "github.com/dunstall/goraft/pkg/elector/conn/mock_conn",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":go_default_library",
+        "//pkg/pb:go_default_library",
+        "@com_github_golang_mock//gomock:go_default_library",
+    ],
+)

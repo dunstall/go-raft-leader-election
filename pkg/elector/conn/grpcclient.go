@@ -1,4 +1,4 @@
-package elector
+package conn
 
 import (
 	"github.com/golang/glog"

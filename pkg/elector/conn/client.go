@@ -1,4 +1,4 @@
-package elector
+package conn
 
 type Client interface {
 	// Dial creates a connection to the server at the given address. Note this

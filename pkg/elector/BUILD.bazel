@@ -13,11 +13,7 @@ go_library(
     ),
     importpath = "github.com/dunstall/goraft/pkg/elector",
     visibility = ["//visibility:public"],
-    deps = [
-        "//pkg/pb:go_default_library",
-        "@com_github_golang_glog//:go_default_library",
-        "@org_golang_google_grpc//:go_default_library",
-    ],
+    deps = ["//pkg/elector/conn:go_default_library"],
 )
 
 load("@gomock_rules//:gomock.bzl", "gomock")
@@ -30,29 +26,9 @@ gomock(
     package = "mock_elector",
 )
 
-gomock(
-    name = "mock_client",
-    out = "mock_client.go",
-    interfaces = ["Client"],
-    library = "//pkg/elector:go_default_library",
-    package = "mock_elector",
-)
-
-gomock(
-    name = "mock_connection",
-    out = "mock_connection.go",
-    interfaces = ["Connection"],
-    library = "//pkg/elector:go_default_library",
-    package = "mock_elector",
-)
-
 go_library(
     name = "go_mock_library",
-    srcs = [
-        "mock_client.go",
-        "mock_connection.go",
-        "mock_elector.go",
-    ],
+    srcs = ["mock_elector.go"],
     importpath = "github.com/dunstall/goraft/pkg/elector/mock_elector",
     visibility = ["//visibility:public"],
     deps = [
@@ -67,7 +43,7 @@ go_test(
     srcs = ["nodeelector_test.go"],
     embed = [":go_default_library"],
     deps = [
-        ":go_mock_library",
+        "//pkg/elector/conn:go_mock_library",
         "@com_github_golang_mock//gomock:go_default_library",
     ],
 )

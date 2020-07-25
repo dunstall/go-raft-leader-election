@@ -7,6 +7,7 @@ go_library(
     visibility = ["//visibility:public"],
     deps = [
         "//pkg/elector:go_default_library",
+        "//pkg/elector/conn:go_default_library",
         "//pkg/node:go_default_library",
         "//pkg/server:go_default_library",
     ],

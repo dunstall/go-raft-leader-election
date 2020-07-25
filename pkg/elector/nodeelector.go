@@ -3,16 +3,18 @@ package elector
 import (
 	"sync"
 	"sync/atomic"
+
+  "github.com/dunstall/goraft/pkg/elector/conn"
 )
 
 type NodeElector struct {
 	elected chan bool
 	id      uint32
-	conns   map[uint32]Connection
+	conns   map[uint32]conn.Connection
 }
 
-func NewNodeElector(id uint32, client Client, nodes map[uint32]string) Elector {
-	conns := make(map[uint32]Connection)
+func NewNodeElector(id uint32, client conn.Client, nodes map[uint32]string) Elector {
+	conns := make(map[uint32]conn.Connection)
 	for nodeID, addr := range nodes {
 		if nodeID != id {
 			conns[nodeID] = client.Dial(addr)
@@ -25,14 +27,14 @@ func (e *NodeElector) Elect(term uint32) {
 	var votes uint32 = 0
 
 	var wg sync.WaitGroup
-	for _, conn := range e.conns {
+	for _, c := range e.conns {
 		wg.Add(1)
-		go func(conn Connection) {
+		go func(c conn.Connection) {
 			defer wg.Done()
-			if conn.RequestVote(term) {
+			if c.RequestVote(term) {
 				atomic.AddUint32(&votes, 1)
 			}
-		}(conn)
+		}(c)
 	}
 
 	wg.Wait()

@@ -1,4 +1,4 @@
-package elector
+package conn
 
 import (
 	"context"

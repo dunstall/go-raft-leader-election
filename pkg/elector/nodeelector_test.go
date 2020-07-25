@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/dunstall/goraft/pkg/elector"
-	"github.com/dunstall/goraft/pkg/elector/mock_elector"
+	"github.com/dunstall/goraft/pkg/elector/conn/mock_conn"
 	"github.com/golang/mock/gomock"
 )
 
@@ -65,7 +65,7 @@ func TestNodeElectorMajorityDeny(t *testing.T) {
 	}
 }
 
-func registerClient(votes uint32, t *testing.T) (*mock_elector.MockClient, map[uint32]string, *gomock.Controller) {
+func registerClient(votes uint32, t *testing.T) (*mock_conn.MockClient, map[uint32]string, *gomock.Controller) {
 	nodes := map[uint32]string{
 		exampleID: "1.1.1.1",
 		0xfb:      "2.2.2.2",
@@ -80,7 +80,7 @@ func registerClient(votes uint32, t *testing.T) (*mock_elector.MockClient, map[u
 		if nodeID == exampleID {
 			continue
 		}
-		conn := mock_elector.NewMockConnection(ctrl)
+		conn := mock_conn.NewMockConnection(ctrl)
 		conn.EXPECT().RequestVote(exampleTerm).Return(votes > 0)
 		client.EXPECT().Dial(addr).Return(conn)
 		if votes > 0 {
@@ -90,7 +90,7 @@ func registerClient(votes uint32, t *testing.T) (*mock_elector.MockClient, map[u
 	return client, nodes, ctrl
 }
 
-func newMockClient(t *testing.T) (*mock_elector.MockClient, *gomock.Controller) {
+func newMockClient(t *testing.T) (*mock_conn.MockClient, *gomock.Controller) {
 	ctrl := gomock.NewController(t)
-	return mock_elector.NewMockClient(ctrl), ctrl
+	return mock_conn.NewMockClient(ctrl), ctrl
 }

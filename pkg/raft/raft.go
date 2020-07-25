@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/dunstall/goraft/pkg/elector"
+	"github.com/dunstall/goraft/pkg/elector/conn"
 	"github.com/dunstall/goraft/pkg/node"
 	"github.com/dunstall/goraft/pkg/server"
 )
@@ -23,7 +24,7 @@ func Run(id uint32) {
 		3: ":4113",
 	}
 
-	e := elector.NewNodeElector(id, elector.NewGRPCClient(id), nodes)
+	e := elector.NewNodeElector(id, conn.NewGRPCClient(id), nodes)
 	node := node.NewNode(id, e)
 
 	server := server.NewServer()
