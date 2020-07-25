@@ -84,7 +84,8 @@ type Server struct {
 
 func NewServer() Server {
 	return Server{
-		VoteRequests: make(chan VoteCallback),
+		VoteRequests:   make(chan VoteCallback),
+		AppendRequests: make(chan AppendCallback),
 	}
 }
 
@@ -101,8 +102,13 @@ func (s *Server) AppendEntries(ctx context.Context, in *pb.AppendEntriesRequest)
 	respChan := make(chan *pb.AppendEntriesResponse)
 	s.AppendRequests <- AppendCallback{in, respChan}
 
-	resp := <-respChan
-	return resp, nil
+	// TODO(AD) Only used for heartbeat so just return success.
+	// resp := <-respChan
+	// return resp, nil
+	return &pb.AppendEntriesResponse{
+		Term:    in.Term,
+		Success: true,
+	}, nil
 }
 
 func (s *Server) ListenAndServe(addr string) error {
