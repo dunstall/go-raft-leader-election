@@ -13,6 +13,7 @@ go_library(
     ),
     importpath = "github.com/dunstall/goraft/pkg/heartbeat",
     visibility = ["//visibility:public"],
+    deps = ["//pkg/conn:go_default_library"],
 )
 
 load("@gomock_rules//:gomock.bzl", "gomock")
