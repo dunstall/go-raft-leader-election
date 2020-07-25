@@ -2,6 +2,7 @@ package node
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/dunstall/goraft/pkg/elector"
 	"github.com/dunstall/goraft/pkg/heartbeat"
@@ -53,6 +54,10 @@ func (n *Node) Expire() {
 func (n *Node) Elect() {
 	glog.Info(n.logFormat("node elected"))
 	n.state.Elect(n)
+}
+
+func (n *Node) Timeout() time.Duration {
+	return n.state.Timeout()
 }
 
 func (n *Node) VoteRequest(req server.VoteRequest) {

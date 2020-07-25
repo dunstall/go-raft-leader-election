@@ -1,6 +1,9 @@
 package node
 
 import (
+	"math/rand"
+	"time"
+
 	"github.com/dunstall/goraft/pkg/server"
 	"github.com/golang/glog"
 )
@@ -22,6 +25,10 @@ func (c *candidate) Expire(node *Node) {
 
 func (c *candidate) Elect(node *Node) {
 	node.setState(NewLeader())
+}
+
+func (c *candidate) Timeout() time.Duration {
+	return time.Duration(time.Duration(rand.Intn(150)+150)) * time.Millisecond * 10
 }
 
 func (c *candidate) VoteRequest(node *Node, req server.VoteRequest) {

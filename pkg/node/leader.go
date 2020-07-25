@@ -1,6 +1,8 @@
 package node
 
 import (
+	"time"
+
 	"github.com/dunstall/goraft/pkg/server"
 	"github.com/golang/glog"
 )
@@ -20,6 +22,11 @@ func (l *leader) Expire(node *Node) {
 }
 
 func (l *leader) Elect(node *Node) {}
+
+func (l *leader) Timeout() time.Duration {
+	// TODO(AD) RTT
+	return 50 * time.Millisecond * 10
+}
 
 func (l *leader) VoteRequest(node *Node, req server.VoteRequest) {
 	if req.Term() > node.Term() {
