@@ -35,12 +35,12 @@ func (conn *GRPCConnection) RequestVote(term uint32) bool {
 	defer cancel()
 	resp, err := conn.client.RequestVote(ctx, req)
 	if err != nil {
-		glog.Warning("error response from connection request vote %s", err)
+		glog.Warningf("error response from connection request vote %s", err)
 		return false
 	}
 
 	if resp.Term != term {
-		glog.Warning("vote response included an invalid term: %d, expected %d", resp.Term, term)
+		glog.Warningf("vote response included an invalid term: %d, expected %d", resp.Term, term)
 		return false
 	}
 
@@ -57,12 +57,12 @@ func (conn *GRPCConnection) RequestAppend(term uint32) bool {
 	defer cancel()
 	resp, err := conn.client.AppendEntries(ctx, req)
 	if err != nil {
-		glog.Warning("error response from connection append entries %s", err)
+		glog.Warningf("error response from connection append entries %s", err)
 		return false
 	}
 
 	if resp.Term != term {
-		glog.Warning("append entries response included an invalid term: %d, expected %d", resp.Term, term)
+		glog.Warningf("append entries response included an invalid term: %d, expected %d", resp.Term, term)
 		return false
 	}
 
