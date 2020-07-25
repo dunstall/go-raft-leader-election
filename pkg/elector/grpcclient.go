@@ -5,10 +5,12 @@ import (
 	"google.golang.org/grpc"
 )
 
-type GRPCClient struct{}
+type GRPCClient struct {
+	id uint32
+}
 
-func NewGRPCClient() Client {
-	return &GRPCClient{}
+func NewGRPCClient(id uint32) Client {
+	return &GRPCClient{id: id}
 }
 
 func (c *GRPCClient) Dial(addr string) Connection {
@@ -17,5 +19,5 @@ func (c *GRPCClient) Dial(addr string) Connection {
 	if err != nil {
 		glog.Fatalf("")
 	}
-	return NewGRPCConnection(conn)
+	return NewGRPCConnection(conn, c.id)
 }

@@ -23,7 +23,7 @@ func Run(id uint32) {
 		3: ":4113",
 	}
 
-	e := elector.NewNodeElector(id, elector.NewGRPCClient(), nodes)
+	e := elector.NewNodeElector(id, elector.NewGRPCClient(id), nodes)
 	node := node.NewNode(id, e)
 
 	server := server.NewServer()
