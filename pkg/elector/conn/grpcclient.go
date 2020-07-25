@@ -5,10 +5,12 @@ import (
 	"google.golang.org/grpc"
 )
 
+// GRPCClient implements Client using gRPC.
 type GRPCClient struct {
 	id uint32
 }
 
+// NewGRPCClient returns a new client with the given node ID.
 func NewGRPCClient(id uint32) Client {
 	return &GRPCClient{id: id}
 }
