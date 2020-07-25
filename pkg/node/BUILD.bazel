@@ -13,6 +13,7 @@ go_library(
     visibility = ["//visibility:public"],
     deps = [
         "//pkg/elector:go_default_library",
+        "//pkg/heartbeat:go_default_library",
         "//pkg/server:go_default_library",
         "@com_github_golang_glog//:go_default_library",
     ],
@@ -28,6 +29,7 @@ go_test(
     embed = [":go_default_library"],
     deps = [
         "//pkg/elector:go_mock_library",
+        "//pkg/heartbeat:go_mock_library",
         "//pkg/server:go_mock_library",
         "@com_github_golang_mock//gomock:go_default_library",
     ],

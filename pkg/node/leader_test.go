@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/dunstall/goraft/pkg/elector/mock_elector"
+	"github.com/dunstall/goraft/pkg/heartbeat/mock_heartbeat"
 	"github.com/dunstall/goraft/pkg/server/mock_server"
 	"github.com/golang/mock/gomock"
 )
@@ -12,19 +13,23 @@ func TestLeaderExpire(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl))
+	var expectedTerm uint32 = 1
+
+	heartbeat := mock_heartbeat.NewMockHeartbeat(ctrl)
+	heartbeat.EXPECT().Beat(expectedTerm)
+
+	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl), heartbeat)
 	node.setState(NewLeader())
 
 	node.Expire()
-	if node.state.name() != followerName {
-		t.Error("expected node to be in follower state")
+	if node.state.name() != leaderName {
+		t.Error("expected node to be in leader state")
 	}
 
-	// The node should have entered a new term.
-	var expected uint32 = 2
+	// The term should not have changed.
 	actual := node.Term()
-	if actual != expected {
-		t.Errorf("node.Term() != %d, actual %d", expected, actual)
+	if actual != expectedTerm {
+		t.Errorf("node.Term() != %d, actual %d", expectedTerm, actual)
 	}
 }
 
@@ -32,7 +37,7 @@ func TestLeaderElect(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl))
+	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl), mock_heartbeat.NewMockHeartbeat(ctrl))
 	node.setState(NewLeader())
 
 	node.Elect()
@@ -52,7 +57,7 @@ func TestLeaderVoteRequestTermGreater(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl))
+	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl), mock_heartbeat.NewMockHeartbeat(ctrl))
 	node.setState(NewLeader())
 
 	var newTerm uint32 = node.Term() + 1
@@ -81,7 +86,7 @@ func TestLeaderVoteRequestTermEqual(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl))
+	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl), mock_heartbeat.NewMockHeartbeat(ctrl))
 	node.setState(NewLeader())
 
 	var newTerm uint32 = node.Term()

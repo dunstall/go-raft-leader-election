@@ -16,9 +16,7 @@ func NewLeader() nodeState {
 }
 
 func (l *leader) Expire(node *Node) {
-	// TODO(AD) Send heartbeat - leader cannot timeout?
-	node.IncTerm()
-	node.setState(NewFollower())
+	node.Heartbeat().Beat(node.Term())
 }
 
 func (l *leader) Elect(node *Node) {}

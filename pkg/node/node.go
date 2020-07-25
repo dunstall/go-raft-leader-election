@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/dunstall/goraft/pkg/elector"
+	"github.com/dunstall/goraft/pkg/heartbeat"
 	"github.com/dunstall/goraft/pkg/server"
 	"github.com/golang/glog"
 )
@@ -18,15 +19,17 @@ type Node struct {
 
 	state nodeState
 
-	elector elector.Elector
+	elector   elector.Elector
+	heartbeat heartbeat.Heartbeat
 }
 
-func NewNode(id uint32, elector elector.Elector) Node {
+func NewNode(id uint32, elector elector.Elector, heartbeat heartbeat.Heartbeat) Node {
 	return Node{
-		id:      id,
-		term:    initialTerm,
-		state:   NewFollower(),
-		elector: elector,
+		id:        id,
+		term:      initialTerm,
+		state:     NewFollower(),
+		elector:   elector,
+		heartbeat: heartbeat,
 	}
 }
 
@@ -64,6 +67,10 @@ func (n *Node) AppendRequest(req server.AppendRequest) {
 
 func (n *Node) Elector() elector.Elector {
 	return n.elector
+}
+
+func (n *Node) Heartbeat() heartbeat.Heartbeat {
+	return n.heartbeat
 }
 
 func (n *Node) setState(state nodeState) {

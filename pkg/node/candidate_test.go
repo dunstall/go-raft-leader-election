@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/dunstall/goraft/pkg/elector/mock_elector"
+	"github.com/dunstall/goraft/pkg/heartbeat/mock_heartbeat"
 	"github.com/dunstall/goraft/pkg/server/mock_server"
 	"github.com/golang/mock/gomock"
 )
@@ -16,7 +17,7 @@ func TestCandidateExpire(t *testing.T) {
 	elector := mock_elector.NewMockElector(ctrl)
 	elector.EXPECT().Elect(expectedTerm)
 
-	node := NewNode(0xfa, elector)
+	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl), mock_heartbeat.NewMockHeartbeat(ctrl))
 	node.setState(NewCandidate())
 
 	node.Expire()
@@ -35,7 +36,7 @@ func TestCandidateElect(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl))
+	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl), mock_heartbeat.NewMockHeartbeat(ctrl))
 	node.setState(NewCandidate())
 
 	node.Elect()
@@ -55,7 +56,7 @@ func TestCandidateVoteRequestTermGreater(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl))
+	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl), mock_heartbeat.NewMockHeartbeat(ctrl))
 	node.setState(NewCandidate())
 
 	var newTerm uint32 = node.Term() + 1
@@ -84,7 +85,7 @@ func TestCandidateVoteRequestTermEqual(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl))
+	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl), mock_heartbeat.NewMockHeartbeat(ctrl))
 	node.setState(NewCandidate())
 
 	var newTerm uint32 = node.Term()

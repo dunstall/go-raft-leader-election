@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/dunstall/goraft/pkg/elector/mock_elector"
+	"github.com/dunstall/goraft/pkg/heartbeat/mock_heartbeat"
 	"github.com/dunstall/goraft/pkg/server/mock_server"
 	"github.com/golang/mock/gomock"
 )
@@ -12,7 +13,7 @@ func TestFollowerInitialTerm(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl))
+	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl), mock_heartbeat.NewMockHeartbeat(ctrl))
 	var expected uint32 = 1
 	actual := node.Term()
 	if actual != expected {
@@ -28,7 +29,7 @@ func TestFollowerExpire(t *testing.T) {
 	elector := mock_elector.NewMockElector(ctrl)
 	elector.EXPECT().Elect(expectedTerm)
 
-	node := NewNode(0xfa, elector)
+	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl), mock_heartbeat.NewMockHeartbeat(ctrl))
 	node.Expire()
 	if node.state.name() != candidateName {
 		t.Error("expected node to be in candidate state")
@@ -45,7 +46,7 @@ func TestFollowerElect(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl))
+	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl), mock_heartbeat.NewMockHeartbeat(ctrl))
 	node.Elect()
 	if node.state.name() != followerName {
 		t.Error("expected node to be in follower state")
@@ -62,7 +63,7 @@ func TestFollowerVoteRequest(t *testing.T) {
 	mockreq.EXPECT().CandidateID().AnyTimes().Return(candidateID)
 	mockreq.EXPECT().Term().AnyTimes().Return(newTerm)
 
-	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl))
+	node := NewNode(0xfa, mock_elector.NewMockElector(ctrl), mock_heartbeat.NewMockHeartbeat(ctrl))
 
 	// As the term is greater the request should be granted.
 	mockreq.EXPECT().Grant()
