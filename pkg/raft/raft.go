@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/dunstall/goraft/pkg/conn"
 	"github.com/dunstall/goraft/pkg/elector"
-	"github.com/dunstall/goraft/pkg/elector/conn"
 	"github.com/dunstall/goraft/pkg/node"
 	"github.com/dunstall/goraft/pkg/server"
 )

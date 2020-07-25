@@ -3,8 +3,8 @@ package elector_test
 import (
 	"testing"
 
+	"github.com/dunstall/goraft/pkg/conn/mock_conn"
 	"github.com/dunstall/goraft/pkg/elector"
-	"github.com/dunstall/goraft/pkg/elector/conn/mock_conn"
 	"github.com/golang/mock/gomock"
 )
 
