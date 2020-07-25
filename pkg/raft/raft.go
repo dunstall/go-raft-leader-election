@@ -30,6 +30,7 @@ func Run(id uint32) {
 	for nodeID, addr := range nodes {
 		if nodeID != id {
 			conns[nodeID] = client.Dial(addr)
+			defer conns[nodeID].Close()
 		}
 	}
 
@@ -52,9 +53,9 @@ func Run(id uint32) {
 			if granted {
 				node.Elect()
 			}
-		case req := <-server.VoteRequests:
+		case req := <-server.VoteRequests():
 			node.VoteRequest(&req)
-		case req := <-server.AppendRequests:
+		case req := <-server.AppendRequests():
 			node.AppendRequest(&req)
 		}
 	}

@@ -24,7 +24,10 @@ load("@gomock_rules//:gomock.bzl", "gomock")
 gomock(
     name = "mock_server",
     out = "mock_server.go",
-    interfaces = ["VoteRequest", "AppendRequest"],
+    interfaces = [
+        "VoteRequest",
+        "AppendRequest",
+    ],
     library = "//pkg/server:go_default_library",
     package = "mock_server",
 )
