@@ -102,13 +102,8 @@ func (s *Server) AppendEntries(ctx context.Context, in *pb.AppendEntriesRequest)
 	respChan := make(chan *pb.AppendEntriesResponse)
 	s.AppendRequests <- AppendCallback{in, respChan}
 
-	// TODO(AD) Only used for heartbeat so just return success.
-	// resp := <-respChan
-	// return resp, nil
-	return &pb.AppendEntriesResponse{
-		Term:    in.Term,
-		Success: true,
-	}, nil
+	resp := <-respChan
+	return resp, nil
 }
 
 func (s *Server) ListenAndServe(addr string) error {
