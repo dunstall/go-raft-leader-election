@@ -42,11 +42,9 @@ func Run(id uint32) {
 	addr := ":" + strconv.Itoa(basePort+int(id))
 	go server.ListenAndServe(addr)
 
-	<-time.After(time.Second * 10)
 	for {
-		d := time.Duration(time.Duration(rand.Intn(150)+150)) * time.Millisecond
 		select {
-		case <-time.After(d):
+		case <-time.After(node.Timeout()):
 			node.Expire()
 		case granted := <-e.Elected():
 			// TODO(AD) pass vote to node so it can log and update (revert to follower if
