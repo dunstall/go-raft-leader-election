@@ -37,7 +37,11 @@ func (l *leader) VoteRequest(node *Node, req server.VoteRequest) {
 }
 
 func (l *leader) AppendRequest(node *Node, req server.AppendRequest) {
-	// TODO(AD)
+	if req.Term() >= node.Term() {
+		l.okAppendRequest(node, req)
+	} else {
+		l.failAppendRequest(node, req)
+	}
 }
 
 func (l *leader) name() string {
@@ -55,4 +59,17 @@ func (l *leader) denyVoteRequest(node *Node, req server.VoteRequest) {
 	req.Deny()
 
 	glog.Infof(node.logFormat("denied vote request with term %d"), req.Term())
+}
+
+func (l *leader) okAppendRequest(node *Node, req server.AppendRequest) {
+	glog.Infof(node.logFormat("reverting to follower"))
+
+	node.setState(NewFollower())
+	node.AppendRequest(req)
+}
+
+func (l *leader) failAppendRequest(node *Node, req server.AppendRequest) {
+	req.Failure()
+
+	glog.Infof(node.logFormat("failed append request with term %d"), req.Term())
 }

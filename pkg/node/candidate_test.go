@@ -108,7 +108,7 @@ func TestCandidateVoteRequestTermEqual(t *testing.T) {
 	}
 }
 
-func TestCandateAppendRequestTermGreater(t *testing.T) {
+func TestCandidateAppendRequestTermGreater(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -137,7 +137,7 @@ func TestCandateAppendRequestTermGreater(t *testing.T) {
 	}
 }
 
-func TestCandateAppendRequestTermEqual(t *testing.T) {
+func TestCandidateAppendRequestTermEqual(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 

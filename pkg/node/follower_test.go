@@ -10,6 +10,7 @@ import (
 )
 
 // TODO(AD) Use a go testing framework? See 7 server patterns blog for expl.
+// TODO(AD) Refactor tests/rewrite (test node rather than states?)
 
 func TestFollowerInitialTerm(t *testing.T) {
 	ctrl := gomock.NewController(t)
