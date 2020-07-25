@@ -15,15 +15,9 @@ type NodeElector struct {
 	conns   map[uint32]conn.Connection
 }
 
-// NewNodeElector returns an elector that uses the given client to contact the
-// given nodes. ID is the candidate ID of the node being elected.
-func NewNodeElector(id uint32, client conn.Client, nodes map[uint32]string) Elector {
-	conns := make(map[uint32]conn.Connection)
-	for nodeID, addr := range nodes {
-		if nodeID != id {
-			conns[nodeID] = client.Dial(addr)
-		}
-	}
+// NewNodeElector returns an elector that uses the given connections to contact
+// the cluster nodes. ID is the candidate ID of the node being elected.
+func NewNodeElector(id uint32, conns map[uint32]conn.Connection) Elector {
 	return &NodeElector{elected: make(chan bool, 1), id: id, conns: conns}
 }
 

@@ -24,7 +24,15 @@ func Run(id uint32) {
 		3: ":4113",
 	}
 
-	e := elector.NewNodeElector(id, conn.NewGRPCClient(id), nodes)
+	client := conn.NewGRPCClient(id)
+	conns := make(map[uint32]conn.Connection)
+	for nodeID, addr := range nodes {
+		if nodeID != id {
+			conns[nodeID] = client.Dial(addr)
+		}
+	}
+
+	e := elector.NewNodeElector(id, conns)
 	node := node.NewNode(id, e)
 
 	server := server.NewServer()
