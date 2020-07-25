@@ -16,6 +16,7 @@ func NewLeader() nodeState {
 }
 
 func (l *leader) Expire(node *Node) {
+	// TODO(AD) Send heartbeat - leader cannot timeout?
 	node.IncTerm()
 	node.setState(NewFollower())
 }
@@ -24,14 +25,9 @@ func (l *leader) Elect(node *Node) {}
 
 func (l *leader) VoteRequest(node *Node, req server.VoteRequest) {
 	if req.Term() > node.Term() {
-		glog.Infof(node.logFormat("granted vote request with term %d"), req.Term())
-
-		node.setState(NewFollower())
-		node.VoteRequest(req)
+		l.grantVoteRequest(node, req)
 	} else {
-		req.Deny()
-
-		glog.Infof(node.logFormat("denied vote request with term %d"), req.Term())
+		l.denyVoteRequest(node, req)
 	}
 }
 
@@ -41,4 +37,17 @@ func (l *leader) AppendEntriesRequest(node *Node) {
 
 func (l *leader) name() string {
 	return leaderName
+}
+
+func (l *leader) grantVoteRequest(node *Node, req server.VoteRequest) {
+	glog.Infof(node.logFormat("granted vote request with term %d"), req.Term())
+
+	node.setState(NewFollower())
+	node.VoteRequest(req)
+}
+
+func (l *leader) denyVoteRequest(node *Node, req server.VoteRequest) {
+	req.Deny()
+
+	glog.Infof(node.logFormat("denied vote request with term %d"), req.Term())
 }

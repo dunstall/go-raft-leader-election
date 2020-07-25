@@ -25,14 +25,9 @@ func (f *follower) Elect(node *Node) {}
 
 func (f *follower) VoteRequest(node *Node, req server.VoteRequest) {
 	if req.Term() > node.Term() {
-		node.SetTerm(req.Term())
-		req.Grant()
-
-		glog.Infof(node.logFormat("granted vote request with term %d"), req.Term())
+		f.grantVoteRequest(node, req)
 	} else {
-		req.Deny()
-
-		glog.Infof(node.logFormat("denied vote request with term %d"), req.Term())
+		f.denyVoteRequest(node, req)
 	}
 }
 
@@ -42,4 +37,17 @@ func (f *follower) AppendEntriesRequest(node *Node) {
 
 func (f *follower) name() string {
 	return followerName
+}
+
+func (f *follower) grantVoteRequest(node *Node, req server.VoteRequest) {
+	node.SetTerm(req.Term())
+	req.Grant()
+
+	glog.Infof(node.logFormat("granted vote request with term %d"), req.Term())
+}
+
+func (f *follower) denyVoteRequest(node *Node, req server.VoteRequest) {
+	req.Deny()
+
+	glog.Infof(node.logFormat("denied vote request with term %d"), req.Term())
 }
