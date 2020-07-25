@@ -22,7 +22,8 @@ func TestNodeElectorOnlyNodeIsSelf(t *testing.T) {
 	defer ctrl.Finish()
 
 	e := elector.NewNodeElector(exampleID, client, nodes)
-	if !e.Elect(exampleTerm) {
+	e.Elect(exampleTerm)
+	if !<-e.Elected() {
 		t.Errorf("e.Elect() != true")
 	}
 }
@@ -33,7 +34,8 @@ func TestNodeElectorAllGrant(t *testing.T) {
 	defer ctrl.Finish()
 
 	e := elector.NewNodeElector(exampleID, client, nodes)
-	if !e.Elect(exampleTerm) {
+	e.Elect(exampleTerm)
+	if !<-e.Elected() {
 		t.Errorf("e.Elect() != true")
 	}
 }
@@ -45,7 +47,8 @@ func TestNodeElectorMajorityGrant(t *testing.T) {
 	defer ctrl.Finish()
 
 	e := elector.NewNodeElector(exampleID, client, nodes)
-	if !e.Elect(exampleTerm) {
+	e.Elect(exampleTerm)
+	if !<-e.Elected() {
 		t.Errorf("e.Elect() != true")
 	}
 }
@@ -56,7 +59,8 @@ func TestNodeElectorMajorityDeny(t *testing.T) {
 	defer ctrl.Finish()
 
 	e := elector.NewNodeElector(exampleID, client, nodes)
-	if e.Elect(exampleTerm) {
+	e.Elect(exampleTerm)
+	if <-e.Elected() {
 		t.Errorf("e.Elect() != false")
 	}
 }

@@ -1,6 +1,8 @@
 package elector
 
 type Elector interface {
-	Elect(term uint32) bool
+	// TODO run in background and write to Election clannel for raft to read
+	Elect(term uint32)
+	Elected() <-chan bool
 	Close()
 }
