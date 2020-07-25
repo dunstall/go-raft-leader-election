@@ -25,7 +25,7 @@ message AppendEntriesResponse {
 
   // true if follower contained entry matching prevLogIndex and prevLogTerm,
   // otherwise false
-  // bool success = 2;
+  bool success = 2;
 }
 
 message RequestVoteRequest {
