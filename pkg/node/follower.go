@@ -31,7 +31,7 @@ func (f *follower) VoteRequest(node *Node, req server.VoteRequest) {
 	}
 }
 
-func (f *follower) AppendEntriesRequest(node *Node) {
+func (f *follower) AppendRequest(node *Node) {
 	// TODO(AD)
 }
 

@@ -8,7 +8,7 @@ type nodeState interface {
 	Expire(node *Node)
 	Elect(node *Node)
 	VoteRequest(node *Node, cb server.VoteRequest)
-	AppendEntriesRequest(node *Node)
+	AppendRequest(node *Node)
 
 	name() string
 }

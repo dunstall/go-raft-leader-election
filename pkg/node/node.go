@@ -57,9 +57,9 @@ func (n *Node) VoteRequest(req server.VoteRequest) {
 	n.state.VoteRequest(n, req)
 }
 
-func (n *Node) AppendEntriesRequest() {
+func (n *Node) AppendRequest() {
 	glog.Info(n.logFormat("received append entries request"))
-	n.state.AppendEntriesRequest(n)
+	n.state.AppendRequest(n)
 }
 
 func (n *Node) Elector() elector.Elector {
