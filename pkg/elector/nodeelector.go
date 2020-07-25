@@ -7,12 +7,16 @@ import (
   "github.com/dunstall/goraft/pkg/elector/conn"
 )
 
+// NodeElector implements Elector by requesting votes from all nodes in the
+// cluster.
 type NodeElector struct {
 	elected chan bool
 	id      uint32
 	conns   map[uint32]conn.Connection
 }
 
+// NewNodeElector returns an elector that uses the given client to contact the
+// given nodes. ID is the candidate ID of the node being elected.
 func NewNodeElector(id uint32, client conn.Client, nodes map[uint32]string) Elector {
 	conns := make(map[uint32]conn.Connection)
 	for nodeID, addr := range nodes {
@@ -24,7 +28,7 @@ func NewNodeElector(id uint32, client conn.Client, nodes map[uint32]string) Elec
 }
 
 func (e *NodeElector) Elect(term uint32) {
-	var votes uint32 = 0
+	var votes uint32
 
 	var wg sync.WaitGroup
 	for _, c := range e.conns {
