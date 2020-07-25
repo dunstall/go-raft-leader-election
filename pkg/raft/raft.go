@@ -7,6 +7,7 @@ import (
 
 	"github.com/dunstall/goraft/pkg/conn"
 	"github.com/dunstall/goraft/pkg/elector"
+	"github.com/dunstall/goraft/pkg/heartbeat"
 	"github.com/dunstall/goraft/pkg/node"
 	"github.com/dunstall/goraft/pkg/server"
 )
@@ -19,9 +20,9 @@ func Run(id uint32) {
 	rand.Seed(time.Now().UnixNano())
 
 	nodes := map[uint32]string{
-		1: ":4111",
-		2: ":4112",
-		3: ":4113",
+		1: "localhost:4111",
+		2: "localhost:4112",
+		3: "localhost:4113",
 	}
 
 	client := conn.NewGRPCClient(id)
@@ -33,7 +34,8 @@ func Run(id uint32) {
 	}
 
 	e := elector.NewNodeElector(id, conns)
-	node := node.NewNode(id, e)
+	hb := heartbeat.NewNodeHeartbeat(id, conns)
+	node := node.NewNode(id, e, hb)
 
 	server := server.NewServer()
 	// TODO(AD) if starting goroutine myst also handler closing
