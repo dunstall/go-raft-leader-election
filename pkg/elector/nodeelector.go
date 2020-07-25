@@ -28,6 +28,10 @@ func NewNodeElector(id uint32, client conn.Client, nodes map[uint32]string) Elec
 }
 
 func (e *NodeElector) Elect(term uint32) {
+	// TODO(AD) Run in background.
+	// go func() {
+	// }()
+
 	var votes uint32
 
 	var wg sync.WaitGroup
