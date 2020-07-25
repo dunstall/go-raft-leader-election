@@ -11,7 +11,7 @@ go_library(
             "mock*.go",
         ],
     ),
-    importpath = "github.com/dunstall/goraft/pkg/elector/conn",
+    importpath = "github.com/dunstall/goraft/pkg/conn",
     visibility = ["//visibility:public"],
     deps = [
         "//pkg/pb:go_default_library",
@@ -26,7 +26,7 @@ gomock(
     name = "mock_client",
     out = "mock_client.go",
     interfaces = ["Client"],
-    library = "//pkg/elector/conn:go_default_library",
+    library = "//pkg/conn:go_default_library",
     package = "mock_conn",
 )
 
@@ -36,7 +36,7 @@ gomock(
     name = "mock_connection",
     out = "mock_connection.go",
     interfaces = ["Connection"],
-    library = "//pkg/elector/conn:go_default_library",
+    library = "//pkg/conn:go_default_library",
     package = "mock_conn",
 )
 
@@ -46,7 +46,7 @@ go_library(
         "mock_client.go",
         "mock_connection.go",
     ],
-    importpath = "github.com/dunstall/goraft/pkg/elector/conn/mock_conn",
+    importpath = "github.com/dunstall/goraft/pkg/conn/mock_conn",
     visibility = ["//visibility:public"],
     deps = [
         ":go_default_library",

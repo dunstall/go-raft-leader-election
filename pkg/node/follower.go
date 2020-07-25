@@ -1,6 +1,9 @@
 package node
 
 import (
+	"math/rand"
+	"time"
+
 	"github.com/dunstall/goraft/pkg/server"
 	"github.com/golang/glog"
 )
@@ -23,6 +26,10 @@ func (f *follower) Expire(node *Node) {
 
 func (f *follower) Elect(node *Node) {}
 
+func (f *follower) Timeout() time.Duration {
+	return time.Duration(time.Duration(rand.Intn(150)+150)) * time.Millisecond * 10
+}
+
 func (f *follower) VoteRequest(node *Node, req server.VoteRequest) {
 	if req.Term() > node.Term() {
 		f.grantVoteRequest(node, req)
@@ -31,8 +38,12 @@ func (f *follower) VoteRequest(node *Node, req server.VoteRequest) {
 	}
 }
 
-func (f *follower) AppendEntriesRequest(node *Node) {
-	// TODO(AD)
+func (f *follower) AppendRequest(node *Node, req server.AppendRequest) {
+	if req.Term() >= node.Term() {
+		f.okAppendRequest(node, req)
+	} else {
+		f.failAppendRequest(node, req)
+	}
 }
 
 func (f *follower) name() string {
@@ -50,4 +61,15 @@ func (f *follower) denyVoteRequest(node *Node, req server.VoteRequest) {
 	req.Deny()
 
 	glog.Infof(node.logFormat("denied vote request with term %d"), req.Term())
+}
+
+func (f *follower) okAppendRequest(node *Node, req server.AppendRequest) {
+	node.SetTerm(req.Term())
+	req.Ok()
+}
+
+func (f *follower) failAppendRequest(node *Node, req server.AppendRequest) {
+	req.Failure()
+
+	glog.Infof(node.logFormat("failed append request with term %d"), req.Term())
 }

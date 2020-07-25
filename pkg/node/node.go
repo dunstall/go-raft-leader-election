@@ -2,8 +2,10 @@ package node
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/dunstall/goraft/pkg/elector"
+	"github.com/dunstall/goraft/pkg/heartbeat"
 	"github.com/dunstall/goraft/pkg/server"
 	"github.com/golang/glog"
 )
@@ -18,15 +20,17 @@ type Node struct {
 
 	state nodeState
 
-	elector elector.Elector
+	elector   elector.Elector
+	heartbeat heartbeat.Heartbeat
 }
 
-func NewNode(id uint32, elector elector.Elector) Node {
+func NewNode(id uint32, elector elector.Elector, heartbeat heartbeat.Heartbeat) Node {
 	return Node{
-		id:      id,
-		term:    initialTerm,
-		state:   NewFollower(),
-		elector: elector,
+		id:        id,
+		term:      initialTerm,
+		state:     NewFollower(),
+		elector:   elector,
+		heartbeat: heartbeat,
 	}
 }
 
@@ -52,18 +56,26 @@ func (n *Node) Elect() {
 	n.state.Elect(n)
 }
 
+func (n *Node) Timeout() time.Duration {
+	return n.state.Timeout()
+}
+
 func (n *Node) VoteRequest(req server.VoteRequest) {
 	glog.Infof(n.logFormat("received vote request from candidate %d"), req.CandidateID())
 	n.state.VoteRequest(n, req)
 }
 
-func (n *Node) AppendEntriesRequest() {
+func (n *Node) AppendRequest(req server.AppendRequest) {
 	glog.Info(n.logFormat("received append entries request"))
-	n.state.AppendEntriesRequest(n)
+	n.state.AppendRequest(n, req)
 }
 
 func (n *Node) Elector() elector.Elector {
 	return n.elector
+}
+
+func (n *Node) Heartbeat() heartbeat.Heartbeat {
+	return n.heartbeat
 }
 
 func (n *Node) setState(state nodeState) {

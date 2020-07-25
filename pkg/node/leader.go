@@ -1,6 +1,8 @@
 package node
 
 import (
+	"time"
+
 	"github.com/dunstall/goraft/pkg/server"
 	"github.com/golang/glog"
 )
@@ -16,12 +18,15 @@ func NewLeader() nodeState {
 }
 
 func (l *leader) Expire(node *Node) {
-	// TODO(AD) Send heartbeat - leader cannot timeout?
-	node.IncTerm()
-	node.setState(NewFollower())
+	node.Heartbeat().Beat(node.Term())
 }
 
 func (l *leader) Elect(node *Node) {}
+
+func (l *leader) Timeout() time.Duration {
+	// TODO(AD) RTT
+	return 50 * time.Millisecond * 10
+}
 
 func (l *leader) VoteRequest(node *Node, req server.VoteRequest) {
 	if req.Term() > node.Term() {
@@ -31,8 +36,12 @@ func (l *leader) VoteRequest(node *Node, req server.VoteRequest) {
 	}
 }
 
-func (l *leader) AppendEntriesRequest(node *Node) {
-	// TODO(AD)
+func (l *leader) AppendRequest(node *Node, req server.AppendRequest) {
+	if req.Term() >= node.Term() {
+		l.okAppendRequest(node, req)
+	} else {
+		l.failAppendRequest(node, req)
+	}
 }
 
 func (l *leader) name() string {
@@ -50,4 +59,17 @@ func (l *leader) denyVoteRequest(node *Node, req server.VoteRequest) {
 	req.Deny()
 
 	glog.Infof(node.logFormat("denied vote request with term %d"), req.Term())
+}
+
+func (l *leader) okAppendRequest(node *Node, req server.AppendRequest) {
+	glog.Infof(node.logFormat("reverting to follower"))
+
+	node.setState(NewFollower())
+	node.AppendRequest(req)
+}
+
+func (l *leader) failAppendRequest(node *Node, req server.AppendRequest) {
+	req.Failure()
+
+	glog.Infof(node.logFormat("failed append request with term %d"), req.Term())
 }

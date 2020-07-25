@@ -5,8 +5,9 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/dunstall/goraft/pkg/conn"
 	"github.com/dunstall/goraft/pkg/elector"
-	"github.com/dunstall/goraft/pkg/elector/conn"
+	"github.com/dunstall/goraft/pkg/heartbeat"
 	"github.com/dunstall/goraft/pkg/node"
 	"github.com/dunstall/goraft/pkg/server"
 )
@@ -19,24 +20,31 @@ func Run(id uint32) {
 	rand.Seed(time.Now().UnixNano())
 
 	nodes := map[uint32]string{
-		1: ":4111",
-		2: ":4112",
-		3: ":4113",
+		1: "localhost:4111",
+		2: "localhost:4112",
+		3: "localhost:4113",
 	}
 
-	e := elector.NewNodeElector(id, conn.NewGRPCClient(id), nodes)
-	node := node.NewNode(id, e)
+	client := conn.NewGRPCClient(id)
+	conns := make(map[uint32]conn.Connection)
+	for nodeID, addr := range nodes {
+		if nodeID != id {
+			conns[nodeID] = client.Dial(addr)
+		}
+	}
+
+	e := elector.NewNodeElector(id, conns)
+	hb := heartbeat.NewNodeHeartbeat(id, conns)
+	node := node.NewNode(id, e, hb)
 
 	server := server.NewServer()
 	// TODO(AD) if starting goroutine myst also handler closing
 	addr := ":" + strconv.Itoa(basePort+int(id))
 	go server.ListenAndServe(addr)
 
-	<-time.After(time.Second * 10)
 	for {
-		d := time.Duration(time.Duration(rand.Intn(150)+150)) * time.Millisecond
 		select {
-		case <-time.After(d):
+		case <-time.After(node.Timeout()):
 			node.Expire()
 		case granted := <-e.Elected():
 			// TODO(AD) pass vote to node so it can log and update (revert to follower if
@@ -46,6 +54,8 @@ func Run(id uint32) {
 			}
 		case req := <-server.VoteRequests:
 			node.VoteRequest(&req)
+		case req := <-server.AppendRequests:
+			node.AppendRequest(&req)
 		}
 	}
 }

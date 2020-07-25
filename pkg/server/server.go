@@ -16,48 +16,92 @@ type VoteRequest interface {
 	Deny()
 }
 
-type Callback struct {
+type VoteCallback struct {
 	Request  *pb.RequestVoteRequest
 	RespChan chan *pb.RequestVoteResponse
 }
 
-func (cb *Callback) Term() uint32 {
+func (cb *VoteCallback) Term() uint32 {
 	return cb.Request.Term
 }
 
-func (cb *Callback) CandidateID() uint32 {
+func (cb *VoteCallback) CandidateID() uint32 {
 	return cb.Request.CandidateId
 }
 
-func (cb *Callback) Grant() {
+func (cb *VoteCallback) Grant() {
 	cb.RespChan <- &pb.RequestVoteResponse{
 		Term:        cb.Request.Term,
 		VoteGranted: true,
 	}
 }
 
-func (cb *Callback) Deny() {
+func (cb *VoteCallback) Deny() {
 	cb.RespChan <- &pb.RequestVoteResponse{
 		Term:        cb.Request.Term,
 		VoteGranted: false,
 	}
 }
 
+type AppendRequest interface {
+	Term() uint32
+	LeaderID() uint32
+	Ok()
+	Failure()
+}
+
+type AppendCallback struct {
+	Request  *pb.AppendEntriesRequest
+	RespChan chan *pb.AppendEntriesResponse
+}
+
+func (cb *AppendCallback) Term() uint32 {
+	return cb.Request.Term
+}
+
+func (cb *AppendCallback) LeaderID() uint32 {
+	return cb.Request.LeaderId
+}
+
+func (cb *AppendCallback) Ok() {
+	cb.RespChan <- &pb.AppendEntriesResponse{
+		Term:    cb.Request.Term,
+		Success: true,
+	}
+}
+
+func (cb *AppendCallback) Failure() {
+	cb.RespChan <- &pb.AppendEntriesResponse{
+		Term:    cb.Request.Term,
+		Success: false,
+	}
+}
+
 type Server struct {
-	VoteRequests chan Callback
+	VoteRequests   chan VoteCallback
+	AppendRequests chan AppendCallback
 }
 
 func NewServer() Server {
 	return Server{
-		VoteRequests: make(chan Callback),
+		VoteRequests:   make(chan VoteCallback),
+		AppendRequests: make(chan AppendCallback),
 	}
 }
 
 func (s *Server) RequestVote(ctx context.Context, in *pb.RequestVoteRequest) (*pb.RequestVoteResponse, error) {
 	respChan := make(chan *pb.RequestVoteResponse)
-	s.VoteRequests <- Callback{in, respChan}
+	s.VoteRequests <- VoteCallback{in, respChan}
 
 	// TODO(AD) Timeout with select?
+	resp := <-respChan
+	return resp, nil
+}
+
+func (s *Server) AppendEntries(ctx context.Context, in *pb.AppendEntriesRequest) (*pb.AppendEntriesResponse, error) {
+	respChan := make(chan *pb.AppendEntriesResponse)
+	s.AppendRequests <- AppendCallback{in, respChan}
+
 	resp := <-respChan
 	return resp, nil
 }

@@ -1,0 +1,39 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    # Required to avoid gazelle including mocks.
+    srcs = glob(
+        # keep
+        ["*.go"],
+        exclude = [
+            "*_test.go",
+            "mock*.go",
+        ],
+    ),
+    importpath = "github.com/dunstall/goraft/pkg/heartbeat",
+    visibility = ["//visibility:public"],
+    deps = ["//pkg/conn:go_default_library"],
+)
+
+load("@gomock_rules//:gomock.bzl", "gomock")
+
+gomock(
+    name = "mock_heartbeat",
+    out = "mock_heartbeat.go",
+    interfaces = ["Heartbeat"],
+    library = "//pkg/heartbeat:go_default_library",
+    package = "mock_heartbeat",
+)
+
+go_library(
+    name = "go_mock_library",
+    srcs = ["mock_heartbeat.go"],
+    importpath = "github.com/dunstall/goraft/pkg/heartbeat/mock_heartbeat",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":go_default_library",
+        "//pkg/pb:go_default_library",
+        "@com_github_golang_mock//gomock:go_default_library",
+    ],
+)
