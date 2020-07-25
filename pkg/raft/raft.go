@@ -46,6 +46,8 @@ func Run(id uint32) {
 			}
 		case req := <-server.VoteRequests:
 			node.VoteRequest(&req)
+		case req := <-server.AppendRequests:
+			node.AppendRequest(&req)
 		}
 	}
 }
