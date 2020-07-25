@@ -68,8 +68,7 @@ func (c *candidate) okAppendRequest(node *Node, req server.AppendRequest) {
 	glog.Infof(node.logFormat("reverting to follower"))
 
 	node.setState(NewFollower())
-	node.SetTerm(req.Term()) // TODO(AD) Use foller.AppendRequest
-	req.Ok()
+	node.AppendRequest(req)
 }
 
 func (c *candidate) failAppendRequest(node *Node, req server.AppendRequest) {
