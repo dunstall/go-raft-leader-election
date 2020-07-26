@@ -15,7 +15,7 @@ func NewNodeHeartbeat(id uint32, conns map[uint32]conn.Connection) Heartbeat {
 }
 
 func (hb *NodeHeartbeat) Beat(term uint32) {
-	go func(term) {
+	go func(term uint32) {
 		for _, c := range hb.conns {
 			go func(c conn.Connection) {
 				// TODO(AD) Not checking result as only used as heartbeat.
