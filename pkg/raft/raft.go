@@ -1,6 +1,7 @@
 package raft
 
 import (
+	"context"
 	"math/rand"
 	"strconv"
 	"time"
@@ -16,31 +17,36 @@ const (
 	basePort = 4110
 )
 
-func Run(id uint32) {
-	rand.Seed(time.Now().UnixNano())
+type ClusterConfig struct {
+	Nodes map[uint32]string
+}
 
-	nodes := map[uint32]string{
-		1: "localhost:4111",
-		2: "localhost:4112",
-		3: "localhost:4113",
-	}
+type Raft struct {
+	id    uint32
+	conns map[uint32]conn.Connection
+}
 
+func NewRaft(id uint32, config ClusterConfig) Raft {
 	client := conn.NewGRPCClient(id)
 	conns := make(map[uint32]conn.Connection)
-	for nodeID, addr := range nodes {
+	for nodeID, addr := range config.Nodes {
 		if nodeID != id {
 			conns[nodeID] = client.Dial(addr)
 		}
 	}
+	return Raft{id: id, conns: conns}
+}
 
-	e := elector.NewNodeElector(id, conns)
-	hb := heartbeat.NewNodeHeartbeat(id, conns)
-	node := node.NewNode(id, e, hb)
+func (r *Raft) Run(ctx context.Context) {
+	rand.Seed(time.Now().UnixNano())
+
+	e := elector.NewNodeElector(r.id, r.conns)
+	hb := heartbeat.NewNodeHeartbeat(r.id, r.conns)
+	node := node.NewNode(r.id, e, hb)
 
 	server := server.NewServer()
-	// TODO(AD) if starting goroutine myst also handler closing
-	addr := ":" + strconv.Itoa(basePort+int(id))
-	go server.ListenAndServe(addr)
+	addr := ":" + strconv.Itoa(basePort+int(r.id))
+	go server.ListenAndServe(ctx, addr)
 
 	for {
 		select {
@@ -52,10 +58,18 @@ func Run(id uint32) {
 			if granted {
 				node.Elect()
 			}
-		case req := <-server.VoteRequests:
+		case req := <-server.VoteRequests():
 			node.VoteRequest(&req)
-		case req := <-server.AppendRequests:
+		case req := <-server.AppendRequests():
 			node.AppendRequest(&req)
+		case <-ctx.Done():
+			return
 		}
+	}
+}
+
+func (r *Raft) Close() {
+	for _, conn := range r.conns {
+		conn.Close()
 	}
 }

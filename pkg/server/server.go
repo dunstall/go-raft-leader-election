@@ -2,120 +2,68 @@ package server
 
 import (
 	"context"
-	"log"
 	"net"
 
 	"github.com/dunstall/goraft/pkg/pb"
 	"google.golang.org/grpc"
 )
 
-type VoteRequest interface {
-	Term() uint32
-	CandidateID() uint32
-	Grant()
-	Deny()
-}
-
-type VoteCallback struct {
-	Request  *pb.RequestVoteRequest
-	RespChan chan *pb.RequestVoteResponse
-}
-
-func (cb *VoteCallback) Term() uint32 {
-	return cb.Request.Term
-}
-
-func (cb *VoteCallback) CandidateID() uint32 {
-	return cb.Request.CandidateId
-}
-
-func (cb *VoteCallback) Grant() {
-	cb.RespChan <- &pb.RequestVoteResponse{
-		Term:        cb.Request.Term,
-		VoteGranted: true,
-	}
-}
-
-func (cb *VoteCallback) Deny() {
-	cb.RespChan <- &pb.RequestVoteResponse{
-		Term:        cb.Request.Term,
-		VoteGranted: false,
-	}
-}
-
-type AppendRequest interface {
-	Term() uint32
-	LeaderID() uint32
-	Ok()
-	Failure()
-}
-
-type AppendCallback struct {
-	Request  *pb.AppendEntriesRequest
-	RespChan chan *pb.AppendEntriesResponse
-}
-
-func (cb *AppendCallback) Term() uint32 {
-	return cb.Request.Term
-}
-
-func (cb *AppendCallback) LeaderID() uint32 {
-	return cb.Request.LeaderId
-}
-
-func (cb *AppendCallback) Ok() {
-	cb.RespChan <- &pb.AppendEntriesResponse{
-		Term:    cb.Request.Term,
-		Success: true,
-	}
-}
-
-func (cb *AppendCallback) Failure() {
-	cb.RespChan <- &pb.AppendEntriesResponse{
-		Term:    cb.Request.Term,
-		Success: false,
-	}
-}
-
+// Server handles incoming requests and routes to the outgoing channels.
+//
+// Each incoming request is pushed to a channel along with a response callback
+// channel. The server then waits for the response. This blocking is ok as each
+// handler runs in its own goroutine.
 type Server struct {
-	VoteRequests   chan VoteCallback
-	AppendRequests chan AppendCallback
+	voteRequests   chan VoteCallback
+	appendRequests chan AppendCallback
 }
 
 func NewServer() Server {
 	return Server{
-		VoteRequests:   make(chan VoteCallback),
-		AppendRequests: make(chan AppendCallback),
+		voteRequests:   make(chan VoteCallback),
+		appendRequests: make(chan AppendCallback),
 	}
 }
 
-func (s *Server) RequestVote(ctx context.Context, in *pb.RequestVoteRequest) (*pb.RequestVoteResponse, error) {
+func (s *Server) VoteRequests() <-chan VoteCallback {
+	return s.voteRequests
+}
+
+func (s *Server) AppendRequests() <-chan AppendCallback {
+	return s.appendRequests
+}
+
+func (s *Server) RequestVote(ctx context.Context, req *pb.RequestVoteRequest) (*pb.RequestVoteResponse, error) {
 	respChan := make(chan *pb.RequestVoteResponse)
-	s.VoteRequests <- VoteCallback{in, respChan}
-
-	// TODO(AD) Timeout with select?
-	resp := <-respChan
-	return resp, nil
+	s.voteRequests <- VoteCallback{req, respChan}
+	return <-respChan, nil
 }
 
-func (s *Server) AppendEntries(ctx context.Context, in *pb.AppendEntriesRequest) (*pb.AppendEntriesResponse, error) {
+func (s *Server) AppendEntries(ctx context.Context, req *pb.AppendEntriesRequest) (*pb.AppendEntriesResponse, error) {
 	respChan := make(chan *pb.AppendEntriesResponse)
-	s.AppendRequests <- AppendCallback{in, respChan}
-
-	resp := <-respChan
-	return resp, nil
+	s.appendRequests <- AppendCallback{req, respChan}
+	return <-respChan, nil
 }
 
-func (s *Server) ListenAndServe(addr string) error {
+func (s *Server) ListenAndServe(ctx context.Context, addr string) error {
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {
-		log.Fatal(err)
-	}
-
-	grpcServer := grpc.NewServer()
-	pb.RegisterRaftServer(grpcServer, s)
-	if err := grpcServer.Serve(lis); err != nil {
 		return err
 	}
-	return nil
+
+	errChan := make(chan error)
+	go func(lis net.Listener, errChan chan<- error) {
+		grpcServer := grpc.NewServer()
+		pb.RegisterRaftServer(grpcServer, s)
+		if err := grpcServer.Serve(lis); err != nil {
+			errChan <- err
+		}
+	}(lis, errChan)
+
+	select {
+	case e := <-errChan:
+		return e
+	case <-ctx.Done():
+		return nil
+	}
 }

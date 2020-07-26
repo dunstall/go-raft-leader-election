@@ -22,26 +22,24 @@ func NewNodeElector(id uint32, conns map[uint32]conn.Connection) Elector {
 }
 
 func (e *NodeElector) Elect(term uint32) {
-	// TODO(AD) Run in background.
-	// go func() {
-	// }()
+	go func() {
+		var votes uint32
 
-	var votes uint32
+		var wg sync.WaitGroup
+		for _, c := range e.conns {
+			wg.Add(1)
+			go func(c conn.Connection) {
+				defer wg.Done()
+				if c.RequestVote(term) {
+					atomic.AddUint32(&votes, 1)
+				}
+			}(c)
+		}
 
-	var wg sync.WaitGroup
-	for _, c := range e.conns {
-		wg.Add(1)
-		go func(c conn.Connection) {
-			defer wg.Done()
-			if c.RequestVote(term) {
-				atomic.AddUint32(&votes, 1)
-			}
-		}(c)
-	}
+		wg.Wait()
 
-	wg.Wait()
-
-	e.elected <- e.isMajority(int(votes))
+		e.elected <- e.isMajority(int(votes))
+	}()
 }
 
 func (e *NodeElector) Elected() <-chan bool {

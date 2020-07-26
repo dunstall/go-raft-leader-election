@@ -15,14 +15,12 @@ func NewNodeHeartbeat(id uint32, conns map[uint32]conn.Connection) Heartbeat {
 }
 
 func (hb *NodeHeartbeat) Beat(term uint32) {
-	// TODO(AD) Run in background.
-	// go func() {
-	// }()
-
-	for _, c := range hb.conns {
-		go func(c conn.Connection) {
-			// TODO(AD) Not checking result as only used as heartbeat.
-			c.RequestAppend(term)
-		}(c)
-	}
+	go func(term uint32) {
+		for _, c := range hb.conns {
+			go func(c conn.Connection) {
+				// TODO(AD) Not checking result as only used as heartbeat.
+				c.RequestAppend(term)
+			}(c)
+		}
+	}(term)
 }
