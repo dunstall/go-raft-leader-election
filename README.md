@@ -1,5 +1,5 @@
 # go-raft Leader Election
-Implementation of Raft consensus algorithm leader election in Go
+Implementation of leader election described in the Raft consensus algorithm
 
 ## Building
 Build using [Bazel](https://bazel.build/). This builds all source files,
