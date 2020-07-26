@@ -1,6 +1,7 @@
 package raft
 
 import (
+	"context"
 	"math/rand"
 	"strconv"
 	"time"
@@ -36,7 +37,7 @@ func NewRaft(id uint32, config ClusterConfig) Raft {
 	return Raft{id: id, conns: conns}
 }
 
-func (r *Raft) Run() {
+func (r *Raft) Run(ctx context.Context) {
 	rand.Seed(time.Now().UnixNano())
 
 	e := elector.NewNodeElector(r.id, r.conns)
@@ -45,7 +46,7 @@ func (r *Raft) Run() {
 
 	server := server.NewServer()
 	addr := ":" + strconv.Itoa(basePort+int(r.id))
-	go server.ListenAndServe(addr)
+	go server.ListenAndServe(ctx, addr)
 
 	for {
 		select {
@@ -61,6 +62,8 @@ func (r *Raft) Run() {
 			node.VoteRequest(&req)
 		case req := <-server.AppendRequests():
 			node.AppendRequest(&req)
+		case <-ctx.Done():
+			return
 		}
 	}
 }

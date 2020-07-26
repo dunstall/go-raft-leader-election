@@ -45,16 +45,25 @@ func (s *Server) AppendEntries(ctx context.Context, req *pb.AppendEntriesRequest
 	return <-respChan, nil
 }
 
-func (s *Server) ListenAndServe(addr string) error {
+func (s *Server) ListenAndServe(ctx context.Context, addr string) error {
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {
 		return err
 	}
 
-	grpcServer := grpc.NewServer()
-	pb.RegisterRaftServer(grpcServer, s)
-	if err := grpcServer.Serve(lis); err != nil {
-		return err
+	errChan := make(chan error)
+	go func(lis net.Listener, errChan chan<- error) {
+		grpcServer := grpc.NewServer()
+		pb.RegisterRaftServer(grpcServer, s)
+		if err := grpcServer.Serve(lis); err != nil {
+			errChan <- err
+		}
+	}(lis, errChan)
+
+	select {
+	case e := <-errChan:
+		return e
+	case <-ctx.Done():
+		return nil
 	}
-	return nil
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"log"
 
@@ -29,6 +30,5 @@ func main() {
 	raft := raft.NewRaft(parseNodeID(), config)
 	defer raft.Close()
 
-	// TODO(AD) Accept context
-	raft.Run()
+	raft.Run(context.Background())
 }
