@@ -9,6 +9,5 @@ service Koala {
 message LeaderLookupRequest {}
 
 message LeaderLookupResponse {
-  bool is_leader = 1;
-  string addr = 2;
+  uint32 leader_id = 1;
 }
