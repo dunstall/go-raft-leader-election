@@ -9,6 +9,7 @@ go_library(
         "//pkg/conn:go_default_library",
         "//pkg/elector:go_default_library",
         "//pkg/heartbeat:go_default_library",
+        "//pkg/koala:go_default_library",
         "//pkg/node:go_default_library",
         "//pkg/server:go_default_library",
     ],

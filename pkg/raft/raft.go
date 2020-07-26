@@ -9,6 +9,7 @@ import (
 	"github.com/dunstall/goraft/pkg/conn"
 	"github.com/dunstall/goraft/pkg/elector"
 	"github.com/dunstall/goraft/pkg/heartbeat"
+	"github.com/dunstall/goraft/pkg/koala"
 	"github.com/dunstall/goraft/pkg/node"
 	"github.com/dunstall/goraft/pkg/server"
 )
@@ -48,6 +49,9 @@ func (r *Raft) Run(ctx context.Context) {
 	addr := ":" + strconv.Itoa(basePort+int(r.id))
 	go server.ListenAndServe(ctx, addr)
 
+	koala := koala.NewServer()
+	go koala.ListenAndServe(ctx, ":3110")
+
 	for {
 		select {
 		case <-time.After(node.Timeout()):
@@ -62,6 +66,8 @@ func (r *Raft) Run(ctx context.Context) {
 			node.VoteRequest(&req)
 		case req := <-server.AppendRequests():
 			node.AppendRequest(&req)
+		case req := <-koala.LeaderLookupRequests():
+			req.Respond(node.LeaderID())
 		case <-ctx.Done():
 			return
 		}
