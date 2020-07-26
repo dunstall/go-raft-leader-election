@@ -15,8 +15,9 @@ const (
 )
 
 type Node struct {
-	id   uint32
-	term uint32
+	id     uint32
+	term   uint32
+	leader uint32
 
 	state nodeState
 
@@ -66,7 +67,8 @@ func (n *Node) VoteRequest(req server.VoteRequest) {
 }
 
 func (n *Node) AppendRequest(req server.AppendRequest) {
-	glog.Info(n.logFormat("received append entries request"))
+	glog.Info(n.logFormat("received append entries request from %d"), req.LeaderID())
+	n.leader = req.LeaderID()
 	n.state.AppendRequest(n, req)
 }
 
@@ -76,6 +78,13 @@ func (n *Node) Elector() elector.Elector {
 
 func (n *Node) Heartbeat() heartbeat.Heartbeat {
 	return n.heartbeat
+}
+
+func (n *Node) LeaderID() uint32 {
+	if n.state.name() == leaderName {
+		return n.id
+	}
+	return n.leader
 }
 
 func (n *Node) setState(state nodeState) {
