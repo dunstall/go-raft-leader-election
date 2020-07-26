@@ -4,7 +4,10 @@ load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
 
 proto_library(
     name = "pb_proto",
-    srcs = ["raft.proto"],
+    srcs = [
+        "koala.proto",
+        "raft.proto",
+    ],
     visibility = ["//visibility:public"],
 )
 

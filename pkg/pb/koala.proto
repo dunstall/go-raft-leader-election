@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package pb;
+
+service Koala {
+  rpc LeaderLookup (LeaderLookupRequest) returns (LeaderLookupResponse);
+}
+
+message LeaderLookupRequest {}
+
+message LeaderLookupResponse {
+  bool is_leader = 1;
+  string addr = 2;
+}
