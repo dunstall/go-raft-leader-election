@@ -24,3 +24,6 @@ Run unit tests:
 ```
   $ bazelisk test ...
 ```
+
+TODO - full dissertation
+https://github.com/ongardie/dissertation/blob/master/stanford.pdf
