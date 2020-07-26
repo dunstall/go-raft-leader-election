@@ -1,5 +1,5 @@
-# go-raft
-Implementation of Raft consensus algorithm in Go
+# go-raft Leader Election
+Implementation of Raft consensus algorithm leader election in Go
 
 ## Building
 Build using [Bazel](https://bazel.build/). This builds all source files,
@@ -25,5 +25,6 @@ Run unit tests:
   $ bazelisk test ...
 ```
 
-TODO - full dissertation
+## Future
+* Extend to covery log replication and see full dissertation
 https://github.com/ongardie/dissertation/blob/master/stanford.pdf
