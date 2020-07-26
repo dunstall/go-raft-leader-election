@@ -17,5 +17,18 @@ func parseNodeID() uint32 {
 }
 
 func main() {
-	raft.Run(parseNodeID())
+	nodes := map[uint32]string{
+		1: "localhost:4111",
+		2: "localhost:4112",
+		3: "localhost:4113",
+	}
+	config := raft.ClusterConfig{
+		Nodes: nodes,
+	}
+
+	raft := raft.NewRaft(parseNodeID(), config)
+	defer raft.Close()
+
+	// TODO(AD) Accept context
+	raft.Run()
 }
