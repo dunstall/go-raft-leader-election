@@ -35,3 +35,5 @@ Run unit tests:
 ## Future
 * Extend to covery log replication and see full dissertation
 https://github.com/ongardie/dissertation/blob/master/stanford.pdf
+
+<a href="https://www.gistgrok.com/">GistGrok: Online C++ Shell and Compiler</a>
